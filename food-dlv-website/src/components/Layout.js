@@ -5,6 +5,7 @@ import Logo from "../assets/images/logo.svg";
 import bag from "../assets/icons/bag.svg";
 import magnifyingGlass from "../assets/icons/magnifying-glass-solid.svg";
 import User from "../assets/icons/user.svg";
+import X from "../assets/icons/x-solid.svg";
 //components
 import Swal from "sweetalert2";
 // services
@@ -15,28 +16,11 @@ import { LayoutBtn } from "./Style/button-styling";
 // mui
 import { styled, useTheme } from "@mui/material/styles";
 import Drawer from "@mui/material/Drawer";
-import List from "@mui/material/List";
 import Divider from "@mui/material/Divider";
-import IconButton from "@mui/material/IconButton";
-import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
-import ChevronRightIcon from "@mui/icons-material/ChevronRight";
-import ListItem from "@mui/material/ListItem";
-import ListItemButton from "@mui/material/ListItemButton";
-import ListItemIcon from "@mui/material/ListItemIcon";
-import ListItemText from "@mui/material/ListItemText";
-import InboxIcon from "@mui/icons-material/MoveToInbox";
-import MailIcon from "@mui/icons-material/Mail";
+import Cart from "../pages/Cart/Cart";
 
 //mui
 const drawerWidth = 360;
-const DrawerHeader = styled("div")(({ theme }) => ({
-  display: "flex",
-  alignItems: "center",
-  padding: theme.spacing(0, 1),
-  // necessary for content to be below app bar
-  ...theme.mixins.toolbar,
-  justifyContent: "flex-start",
-}));
 
 const Layout = ({ currentUser, setCurrentUser }) => {
   const navigate = useNavigate();
@@ -73,7 +57,6 @@ const Layout = ({ currentUser, setCurrentUser }) => {
     navigate("/store/" + address);
   };
 
-  //以下為 mui
   const theme = useTheme();
   const [open, setOpen] = React.useState(false);
 
@@ -205,27 +188,13 @@ const Layout = ({ currentUser, setCurrentUser }) => {
           anchor="right"
           open={open}
         >
-          <DrawerHeader>
-            <IconButton onClick={handleDrawerClose}>
-              <ChevronRightIcon />
-            </IconButton>
-          </DrawerHeader>
-          <p>圖圖咖啡</p>
-          <Divider />
-          <List>
-            {["Inbox", "Starred", "Send email", "Drafts"].map((text, index) => (
-              <ListItem key={text} disablePadding>
-                <ListItemButton>
-                  <ListItemIcon>
-                    {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
-                  </ListItemIcon>
-                  <ListItemText primary={text} />
-                </ListItemButton>
-              </ListItem>
-            ))}
-          </List>
-          <Divider />
-          <List></List>
+          <div className="flex justify-end mr-8 mt-4">
+            <button onClick={handleDrawerClose}>
+              <img src={X} alt="x.svg" className="w-4" />
+            </button>
+          </div>
+          {/* <Divider /> */}
+          <Cart currentUser={currentUser} />
         </Drawer>
         <Outlet />
       </div>

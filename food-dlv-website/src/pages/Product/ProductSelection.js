@@ -1,35 +1,25 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ProductSelectionService from "../../services/Cart/productSelection.service";
 import CartService from "../../services/Cart/cart.service";
-import ProductInfo from "../../components/Cart/ProductSelection/ProductInfo";
-import List from "../../components/Cart/ProductSelection/List";
+import ProductInfo from "../../components/ProductSelection/ProductInfo";
+import List from "../../components/ProductSelection/List";
 
-const ProductSelection = () => {
-  const [memberId, setMemberId] = useState("");
-  const [productId, setProductId] = useState("");
-  const [state, setState] = useState("");
+const ProductSelection = ({ data, productId, currentUser }) => {
+  const memberId = currentUser.userId;
   const [product, setProduct] = useState(null);
   const [selectItems, setSelectItems] = useState([]);
   const [qty, setQty] = useState(1);
 
-  function textProductId(e) {
-    setProductId(e.target.value);
-  }
-  function textState(e) {
-    setState(e.target.value);
-  }
-  function textMemberId(e) {
-    setMemberId(e.target.value);
-  }
-
-  function getProduct() {
-    ProductSelectionService.getProductSelect(productId, state)
-      .then(function (response) {
-        setProduct(response.data);
-      })
-      .catch(function (error) {
-        console.log(error);
-      });
+  async function getProduct() {
+    try {
+      const response = await ProductSelectionService.getProductSelect(
+        productId
+      );
+      setProduct(response.data);
+      console.log(response.data);
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   function numberQty(e) {
@@ -63,21 +53,12 @@ const ProductSelection = () => {
       });
   }
 
+  useEffect(() => {
+    getProduct();
+  }, [productId]);
+
   return (
     <div>
-      <div>
-        <label>MemberId:</label>
-        <input type="text" value={memberId} onChange={textMemberId} />
-      </div>
-      <div>
-        <label>ProductId:</label>
-        <input type="text" value={productId} onChange={textProductId} />
-      </div>
-      <div>
-        <label>State:</label>
-        <input type="text" value={state} onChange={textState} />
-      </div>
-      <button onClick={getProduct}>GetProduct</button>
       {product && (
         <div>
           {/* 紀錄產品訊息 */}

@@ -1,26 +1,41 @@
 import React, { useState } from "react";
 import BgImage from "../../components/Product/BgImage";
-import ProductInfo from "../../components/Product/ProductInfo";
+import ProductDisplay from "../../components/Product/ProductDisplay";
 import StoreInfo from "../../components/Product/StoreInfo";
-import Overlay from "../../components/Product/Overlay";
+import ProductOverlay from "../../components/Product/ProductOverlay";
+import useOverlay from "../../hooks/useOverlay";
 
-const ProductPage = ({ data }) => {
-  const [isOpen, setIsOpen] = useState(false);
+const ProductPage = ({ data, currentUser }) => {
+  const { isOpen, setIsOpen, bubblePreventer } = useOverlay();
+  const [id, setId] = useState(0);
 
-  const toggleOverlay = () => {
+  const openOverlay = (e) => {
+    setIsOpen(true);
+    setId(e);
+  };
+
+  const closeOverlay = () => {
     setIsOpen(!isOpen);
   };
+
   return (
     <div>
       <BgImage data={data} />
       <StoreInfo data={data} />
-      <Overlay isOpen={isOpen} onClose={toggleOverlay} />
+      <ProductOverlay
+        isOpen={isOpen}
+        onClose={closeOverlay}
+        currentUser={currentUser}
+        bubblePreventer={bubblePreventer}
+        data={data}
+        id={id}
+      />
       <ul className="flex flex-wrap justify-center">
         {data.products.length !== 0 &&
           data.products.map((d) => {
             return (
-              <ProductInfo
-                toggleOverlay={toggleOverlay}
+              <ProductDisplay
+                openOverlay={() => openOverlay(d.id)}
                 products={d}
                 key={d.id}
               />

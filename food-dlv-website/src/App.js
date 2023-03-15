@@ -10,7 +10,6 @@ import Register from "./pages/User/Register";
 import User from "./pages/User/User";
 import Error from "./pages/Error";
 import Home from "./pages/Home/Home";
-import Cart from "./pages/Cart/ProductSelection";
 import Store from "./pages/Store/Store";
 import Product from "./pages/Product/Product";
 // *外送員介面
@@ -47,12 +46,6 @@ function App() {
         >
           <Route index element={<Home />}></Route>
           <Route path="user" element={<User />}></Route>
-          <Route
-            path="cart"
-            currentUser={currentUser}
-            setCurrentUser={setCurrentUser}
-            element={<Cart />}
-          ></Route>
           <Route
             path="login"
             currentUser={currentUser}

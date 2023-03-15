@@ -1,28 +1,20 @@
 import { useState, useEffect } from "react";
 
 import CartService from "../../services/Cart/cart.service";
+import ShoppingCart from "../../assets/images/shopping_cart.png";
+import { LayoutBtn } from "../../components/Style/button-styling";
+import { Link } from "react-router-dom";
 
 const Cart = ({ currentUser, storeId }) => {
   const memberId = currentUser.userId;
-  //State設定
-  // const [memberId, setMemberId] = useState(currentUser.userId);
-  // const [storeId, setStoreId] = useState("");
   const [identifyNum, setIdentifyNum] = useState("");
-  const [cartDetail, setCartDetail] = useState(null);
-
-  //替代'Member'點擊'購物車內容'需要的輸入值, 若串接完成, 可刪除
-  // function textMemberId(e) {
-  //   setMemberId(e.target.value);
-  // }
-  // function textStoreId(e) {
-  //   setStoreId(e.target.value);
-  // }
+  const [cartDetail, setCartDetail] = useState([]);
 
   //展示購物車內容
   function CartInfo() {
-    CartService.getCartInfo(memberId, storeId)
+    CartService.getCartInfo(memberId)
       .then(function (response) {
-        console.log(response.data);
+        // console.log(response.data);
         setCartDetail(response.data);
       })
       .catch(function (error) {
@@ -32,7 +24,7 @@ const Cart = ({ currentUser, storeId }) => {
 
   //條件:在memberId或storeId改變時, 重新獲取購物車內容
   useEffect(function () {
-    if (memberId && storeId) {
+    if (memberId) {
       CartInfo();
     }
   }, []);
@@ -97,24 +89,14 @@ const Cart = ({ currentUser, storeId }) => {
 
   return (
     <div>
-      <div>
-        <label>MemberId:{currentUser.userId}</label>
-        {/* <input type="text" value={memberId} onChange={textMemberId} /> */}
-      </div>
-      <div>
-        <label>StoreId:{storeId}</label>
-      </div>
-      <button onClick={() => CartInfo()}>GetCartInfo</button>
-
-      {cartDetail && (
+      {/* 如果購物車有東西，就顯示資訊 */}
+      {cartDetail.length !== 0 && (
         <div>
           <p>{cartDetail.storeName}</p>
           <button onClick={() => DeleteCart(memberId, cartDetail.storeId)}>
             DeleteCart
           </button>
           <p>{cartDetail.total}</p>
-
-          {/* 展開購物車的CartDetail */}
           <div>
             {cartDetail.cartDetails.map((detail) => {
               return (
@@ -134,6 +116,16 @@ const Cart = ({ currentUser, storeId }) => {
               );
             })}
           </div>
+        </div>
+      )}
+      {cartDetail.length === 0 && (
+        <div className="flex justify-center items-center h-screen flex-col">
+          <img src={ShoppingCart} alt="shoppingCart.png" className="w-2/3" />
+          <h2 className="text-xl font-bold my-2">購物車是空的!</h2>
+          <p className="mb-4">來把錢錢變成喜歡的東西吧~</p>
+          <LayoutBtn>
+            <Link to="/store">開逛</Link>
+          </LayoutBtn>
         </div>
       )}
     </div>

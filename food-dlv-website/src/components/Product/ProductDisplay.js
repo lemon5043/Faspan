@@ -1,11 +1,11 @@
 import React from "react";
 
-const ProductInfo = ({ products, toggleOverlay }) => {
+const ProductDisplay = ({ products, openOverlay }) => {
   const productImg = require(`../../assets/images/public/Products/${products.photo}`);
   return (
     <li
       className="p-6 border-b-2 cursor-pointer flex justify-between w-full lg:w-1/2 hover:bg-neutral-200 transition"
-      onClick={toggleOverlay}
+      onClick={openOverlay}
     >
       <div>
         <h3 className="font-semibold text-lg">{products.productName}</h3>
@@ -17,4 +17,4 @@ const ProductInfo = ({ products, toggleOverlay }) => {
   );
 };
 
-export default ProductInfo;
+export default ProductDisplay;
