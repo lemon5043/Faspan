@@ -9,8 +9,34 @@ import User from "../assets/icons/user.svg";
 import Swal from "sweetalert2";
 // services
 import userAuthService from "../services/User/userAuth.service";
+// styled components
 import { DropdownItem, DropdownMenu, Trigger } from "./Style/dropdown-styling";
 import { LayoutBtn } from "./Style/button-styling";
+// mui
+import { styled, useTheme } from "@mui/material/styles";
+import Drawer from "@mui/material/Drawer";
+import List from "@mui/material/List";
+import Divider from "@mui/material/Divider";
+import IconButton from "@mui/material/IconButton";
+import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
+import ChevronRightIcon from "@mui/icons-material/ChevronRight";
+import ListItem from "@mui/material/ListItem";
+import ListItemButton from "@mui/material/ListItemButton";
+import ListItemIcon from "@mui/material/ListItemIcon";
+import ListItemText from "@mui/material/ListItemText";
+import InboxIcon from "@mui/icons-material/MoveToInbox";
+import MailIcon from "@mui/icons-material/Mail";
+
+//mui
+const drawerWidth = 360;
+const DrawerHeader = styled("div")(({ theme }) => ({
+  display: "flex",
+  alignItems: "center",
+  padding: theme.spacing(0, 1),
+  // necessary for content to be below app bar
+  ...theme.mixins.toolbar,
+  justifyContent: "flex-start",
+}));
 
 const Layout = ({ currentUser, setCurrentUser }) => {
   const navigate = useNavigate();
@@ -45,6 +71,18 @@ const Layout = ({ currentUser, setCurrentUser }) => {
   const searchHandler = () => {
     if (address === "") return;
     navigate("/store/" + address);
+  };
+
+  //以下為 mui
+  const theme = useTheme();
+  const [open, setOpen] = React.useState(false);
+
+  const handleDrawerOpen = () => {
+    setOpen(true);
+  };
+
+  const handleDrawerClose = () => {
+    setOpen(false);
   };
 
   return (
@@ -141,14 +179,54 @@ const Layout = ({ currentUser, setCurrentUser }) => {
             </div>
             {/* 購物車超連結 */}
             <div className="p-4">
-              <Link to="/cart" className="text-base">
-                <img src={bag} alt="bag.svg" className="w-4" />
-              </Link>
+              <button>
+                <img
+                  src={bag}
+                  alt="bag.svg"
+                  className="w-4"
+                  onClick={handleDrawerOpen}
+                  sx={{ ...(open && { display: "none" }) }}
+                />
+              </button>
             </div>
           </li>
         </ul>
       </nav>
       <div className="h-full">
+        <Drawer
+          sx={{
+            width: drawerWidth,
+            flexShrink: 0,
+            "& .MuiDrawer-paper": {
+              width: drawerWidth,
+            },
+          }}
+          variant="persistent"
+          anchor="right"
+          open={open}
+        >
+          <DrawerHeader>
+            <IconButton onClick={handleDrawerClose}>
+              <ChevronRightIcon />
+            </IconButton>
+          </DrawerHeader>
+          <p>圖圖咖啡</p>
+          <Divider />
+          <List>
+            {["Inbox", "Starred", "Send email", "Drafts"].map((text, index) => (
+              <ListItem key={text} disablePadding>
+                <ListItemButton>
+                  <ListItemIcon>
+                    {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
+                  </ListItemIcon>
+                  <ListItemText primary={text} />
+                </ListItemButton>
+              </ListItem>
+            ))}
+          </List>
+          <Divider />
+          <List></List>
+        </Drawer>
         <Outlet />
       </div>
     </div>

@@ -29,6 +29,7 @@ import DriverHistory from "./pages/Delivery/DriverHistory";
 import "./assets/styles/tailwind.css";
 //services
 import UserAuthService from "./services/User/userAuth.service";
+import Test from "./pages/___test___/Sidebar.test";
 
 function App() {
   let [currentUser, setCurrentUser] = useState(
@@ -65,6 +66,7 @@ function App() {
         </Route>
         {/* 外送員頁面 */}
         {/* 註冊登入 */}
+        <Route path="/test" element={<Test />}></Route>
         <Route path="/delivery/register" element={<DriverRegister />}></Route>
         <Route path="/delivery/login" element={<DriverLogin />}></Route>
         <Route element={<DriverLayout />}>
