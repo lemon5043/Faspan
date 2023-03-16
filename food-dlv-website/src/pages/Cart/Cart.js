@@ -4,39 +4,40 @@ import CartService from "../../services/Cart/cart.service";
 import ShoppingCart from "../../assets/images/shopping_cart.png";
 import { LayoutBtn } from "../../components/Style/button-styling";
 import { Link } from "react-router-dom";
+import useCart from "../../hooks/useCart";
 
 const Cart = ({ currentUser, storeId }) => {
+  const { cartDetail, setCartDetail, CartInfo, refreshCart, setRefreshCart } =
+    useCart();
+
   const [identifyNum, setIdentifyNum] = useState("");
-  const [cartDetail, setCartDetail] = useState([]);
 
   //展示購物車內容
-  function CartInfo(index) {
-    CartService.getCartInfo(currentUser.userId)
-      .then(function (response) {
-        console.log(response.data);
-        setCartDetail(response.data[index]);
-        console.log(response.data[index]);
-      })
-      .catch(function (error) {
-        console.log(error);
-      });
-  }
 
-  //條件:在memberId或storeId改變時, 重新獲取購物車內容
+  //條件:剛開啟網頁時改變購物車的內容
   useEffect(function () {
     if (currentUser) {
-      CartInfo(0);
+      CartInfo(0, currentUser.userId);
     }
   }, []);
 
   //條件:在cartDetail改變時, 重新獲取購物車的產品明細
   useEffect(
     function () {
-      if (cartDetail) {
-        setCartDetail(cartDetail);
+      if (currentUser) {
+        CartInfo(0, currentUser.userId);
+      } else {
+        setCartDetail([]);
       }
     },
-    [cartDetail]
+    [currentUser]
+  );
+
+  useEffect(
+    function () {
+      CartInfo(0, currentUser.userId);
+    },
+    [refreshCart]
   );
 
   //修改購物車'被選取'商品明細
@@ -90,7 +91,7 @@ const Cart = ({ currentUser, storeId }) => {
   return (
     <div>
       {/* 如果購物車有東西，就顯示資訊 */}
-      {cartDetail.length !== 0 && (
+      {cartDetail && cartDetail.length !== 0 && (
         <div>
           <p className="text-3xl font-semibold">{cartDetail.storeName}</p>
           <button

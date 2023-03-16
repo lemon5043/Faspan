@@ -21,6 +21,7 @@ const ProductOverlay = ({
                   data={data}
                   productId={id}
                   currentUser={currentUser}
+                  onClose={onClose}
                 />
               </div>
             </OverlayMain>

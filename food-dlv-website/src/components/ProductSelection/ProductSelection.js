@@ -8,13 +8,15 @@ import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
+import useCart from "../../hooks/useCart";
 
-const ProductSelection = ({ productId, currentUser }) => {
+const ProductSelection = ({ productId, currentUser, onClose }) => {
   const [product, setProduct] = useState(null);
   const [selectItems, setSelectItems] = useState([]);
   const [qty, setQty] = useState(1);
 
   const navigate = useNavigate();
+  const { refreshCart, setRefreshCart } = useCart();
 
   // 點擊後彈出視窗顯示產品內容
   async function getProduct() {
@@ -51,7 +53,7 @@ const ProductSelection = ({ productId, currentUser }) => {
     }
   };
 
-  function AddToCart() {
+  async function AddToCart() {
     if (!currentUser) {
       Swal.fire({
         text: "請先登入才能點餐喔!",
@@ -68,19 +70,25 @@ const ProductSelection = ({ productId, currentUser }) => {
       });
       return;
     }
-    CartService.postAddToCart(
-      currentUser.userId,
-      product.storeId,
-      productId,
-      selectItems,
-      qty
-    )
-      .then(function (response) {
-        console.log(response.data);
-      })
-      .catch(function (error) {
-        console.log(error);
-      });
+    try {
+      await CartService.postAddToCart(
+        currentUser.userId,
+        product.storeId,
+        productId,
+        selectItems,
+        qty
+      );
+      setRefreshCart("123");
+      console.log(refreshCart);
+      Swal.fire({
+        title: "已加入購物車!",
+        icon: "success",
+        timer: 2000,
+        showConfirmButton: false,
+      }).then(() => onClose());
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   useEffect(() => {
