@@ -41,8 +41,8 @@ namespace FoodDlvAPI.Models.Services
         public async Task<string> NavigationToCustomer(int orderId)
         {
             var query = await _repository.NavigationToCustomer(orderId);
-            string token = await _repository.GetKey("GoogleMap");
-            string start = query.StoreAddress;
+            //string token = await _repository.GetKey("GoogleMap");
+            //string start = query.StoreAddress;
             string end = query.DeliveryAddress;
             // Create a request for the URL. 		
             //WebRequest request = WebRequest.Create("https://maps.googleapis.com/maps/api/directions/json?language=zh-TW&origin=" + start + "&destination=" + end + "&key=" + token);

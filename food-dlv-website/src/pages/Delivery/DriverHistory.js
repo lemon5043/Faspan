@@ -1,56 +1,65 @@
-import React, { useState } from "react";
+import { useState, useEffect } from "react";
 import driverAuthService from "../../services/Delivery/driverAuth.service";
 import delieveryRecordsService from "../../services/Delivery/delieveryRecords.service";
 
 
 const DriverHistory = () => {
-  let [month, setMonth] = useState("")
-  let [year, setYear] = useState("")
   let [errorMessage, setErrorMessage] = useState("");
-  //測試用
-  // const y = 2023;
-  // const m = 3;
-  // const token = localStorage.getItem("driver")
-  // const driver =  driverAuthService.GetDriver(token).then(
-  //   function(response){
-  //     const driverRecords = delieveryRecordsService.GetAllRecrodes(response.data.driverId,token).then(
-  //       function(details){
-  //         console.log(details)
-  //       }       
-  //     );
-
-  //     const driverDetail = delieveryRecordsService.GetRecrodesByMonth(y,m,response.data.driverId,token).then(
-  //       function(details){
-  //         console.log(details)
-  //       }       
-  //     )     
-  //   }
-  // )
+  let [delieveryRecords,setDelieveryRecords] = useState([])
+  const token = localStorage.getItem("driver")
+  
+  useEffect(()=>{
+    GetAllRecrodes()
+  },[])
 
   const GetAllRecrodes = async (e) => {
     try {
-      const token = localStorage.getItem("driver")
-      let driver = (await driverAuthService.GetDriver(token))
-      const driverDetail = await (await delieveryRecordsService.GetAllRecrodes(driver.data.driverId, token)).data
+      let driver = await driverAuthService.GetDriver(token)
+      const delieveryRecords = await (await delieveryRecordsService.GetAllRecrodes(driver.data.driverId, token)).data
+      console.log(delieveryRecords)
+      setDelieveryRecords(delieveryRecords)
     }
-    catch {
-      setErrorMessage(e.response.data.wrongAccountOrPassword[0]);
+    catch(e) {
+      setErrorMessage(e.response.data.errorMessage[0]);
     }
   }
 
 
 
-  const GetRecrodesByMonth = async (e) => {
+  async function GetRecrodesByMonth(year,month){
     try {
       const token = localStorage.getItem("driver")
-      let driver = (await driverAuthService.GetDriver(token))
-      const driverDetail = await (await delieveryRecordsService.GetRecrodesByMonth(setYear, setMonth, driver.data.driverId, token)).data
+      let driver = await driverAuthService.GetDriver(token)
+      const driverDetail = await (await delieveryRecordsService.GetRecrodesByMonth(year, month, driver.data.driverId, token)).data
     }
-    catch {
-      setErrorMessage(e.response.data.wrongAccountOrPassword[0]);
+    catch(e) {
+      setErrorMessage(e.response.data.errorMessage[0]);
     }
   }
-  return <div className="text-white">DriverHistory</div>;
+  return <div className="text-white">
+    <thead>
+      <tr>
+        <th>外送次數</th>
+        <th>總里程數</th>
+        <th>結算月份</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody> 
+      {delieveryRecords.map((Records) => {
+    return (
+      <tr>
+        <td>{Records.totalDelievery}</td>
+        <td>{Records.totalMilage}</td>
+        <td>{Records.orderDate}</td>
+        <td >詳細</td>
+      </tr>                      
+      );
+  })}
+      </tbody>  
+ 
+              
+</div>;
 
 };
 export default DriverHistory;

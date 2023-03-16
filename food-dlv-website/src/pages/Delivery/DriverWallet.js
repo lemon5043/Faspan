@@ -1,55 +1,54 @@
-import React, { useState } from "react";
+import { useState,useEffect } from "react";
 import driverAuthService from "../../services/Delivery/driverAuth.service";
 import paysService from "../../services/Delivery/pays.service";
 
 
 const DriverWallet = () => {
-  let [month, setMonth] = useState("")
-  let [year, setYear] = useState("")
   let [errorMessage, setErrorMessage] = useState("");
-  //測試用
-  // const y = 2023;
-  // const m = 1;
-  // const token = localStorage.getItem("driver")
-  // const driver =  driverAuthService.GetDriver(token).then(
-  //   function(response){
-  //     const driverRecords = paysService.GetAllPayRecrodes(response.data.driverId,token).then(
-  //       function(details){
-  //         console.log(details.data)
-  //       }       
-  //     );
+  let [payDetail,setPayDetail] =useState([])
+ const token = localStorage.getItem("driver")
+  useEffect(() => {
+    GetAllPayRecrodes()
+  }, [])
+ 
 
-  //     const driverDetail = paysService.GetPayRecrodesByMonth(y,m,response.data.driverId,token).then(
-  //       function(details){
-  //         console.log(details.data)
-  //       }       
-  //     )     
+  const GetAllPayRecrodes = async (e) => {
+    try {      
+      let driver = (await driverAuthService.GetDriver(token))
+      const payDetail = await (await paysService.GetAllPayRecrodes(driver.data.driverId, token)).data
+      setPayDetail(payDetail);
+    }
+    catch(e) {
+      setErrorMessage(e.response.data.wrongAccountOrPassword[0]);
+    }
+  }
+
+  // async function GetPayRecrodesByMonth(year,month){
+  //   try {
+  //     let driver = (await driverAuthService.GetDriver(token))
+  //     const payDetail = await (await paysService.GetPayRecrodesByMonth(year, month, driver.data.driverId, token)).data
+  //     console.log(payDetail)
+  //     setPayDetail(payDetail);
   //   }
-  // )
-
-  const GetAllRecrodes = async (e) => {
-    try {
-      const token = localStorage.getItem("driver")
-      let driver = (await driverAuthService.GetDriver(token))
-      const driverDetail = await (await paysService.GetAllPayRecrodes(driver.data.driverId, token)).data
-    }
-    catch {
-      setErrorMessage(e.response.data.wrongAccountOrPassword[0]);
-    }
-  }
-
-  const GetRecrodesByMonth = async (e) => {
-    try {
-      const token = localStorage.getItem("driver")
-      let driver = (await driverAuthService.GetDriver(token))
-      const driverDetail = await (await paysService.GetPayRecrodesByMonth(setYear, setMonth, driver.data.driverId, token)).data
-    }
-    catch {
-      setErrorMessage(e.response.data.wrongAccountOrPassword[0]);
-    }
-  }
-  return <div className="text-white">DriverWallet</div>;
-
+  //   catch(e) {
+  //     setErrorMessage(e.response.data.wrongAccountOrPassword[0]);
+  //   }
+  // }
+  return <div className="text-white">
+     <div>
+            {payDetail.map((detail) => {
+              return (
+                <div key={detail.id}>
+                  <p>外送次數:{detail.deliveryCount}</p>
+                  <p>總里程數:{detail.totalMilage}</p>
+                  <p>獎勵金:{detail.bouns}</p>
+                  <p>實付總額:{detail.totalPay}</p>
+                  <p>結算月份:{detail.settlementMonth}</p>
+                </div>                      
+                );
+            })}
+          </div>                
+  </div>;
 };
 
 
