@@ -7,12 +7,8 @@ class DelieveryService {
     return axios.put(API_URL + "/ChangeWorkingStatus", { DriverId, Longitude, Latitude });
   }
 
-  UpdateLocation(formData) {
-    return axios.put(API_URL + "/UpdateLocation", formData, {
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+  UpdateLocation(DriverId, Longitude, Latitude) {
+    return axios.put(API_URL + "/UpdateLocation", { DriverId, Longitude, Latitude });
   }
 
   OrderAasignment(orderId) {

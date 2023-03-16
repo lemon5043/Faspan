@@ -18,8 +18,8 @@ import swal from "sweetalert2";
 
 const DriverMap = () => {
   const { isLoaded, loadError } = useJsApiLoader({
-    // googleMapsApiKey: process.env.REACT_APP_GOOGLE_MAPS_API_KEY,
-    googleMapsApiKey: "",
+    googleMapsApiKey: process.env.REACT_APP_GOOGLE_MAPS_API_KEY,
+    //googleMapsApiKey: "",
   });
   let [orderId, setOrderId] = useState(0);
   let [driverId, setDriverId] = useState(0);
@@ -34,10 +34,11 @@ const DriverMap = () => {
   const [directionsResponse, setDirectionsResponse] = useState(null);
   const [distance, setDistance] = useState(0);
   const [duration, setDuration] = useState(0);
-  const dstTest = "桃園市中壢區新生路三段12號";
+  //const dstTest = "桃園市中壢區新生路三段12號";
   const token = localStorage.getItem("driver");
 
   useEffect(() => {
+    //設定進入頁面時會不斷更新位置
     let timerId = null;
     if (navigator.geolocation) {
       timerId = setInterval(() => {
@@ -51,13 +52,21 @@ const DriverMap = () => {
           (error) => console.error(error),
           { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
         );
-      }, 1000);
+      }
+      , 1000);
     } else {
       console.error("Geolocation is not supported by this browser.");
     }
 
     return () => clearInterval(timerId);
+
+
   }, []);
+
+  //地圖載入錯誤
+  if (loadError) {
+    return <div>Map cannot be loaded right now, sorry.</div>;
+  }
 
   //路程計算
   async function calculateRoute(destination) {
@@ -65,7 +74,7 @@ const DriverMap = () => {
     const directionsService = new google.maps.DirectionsService();
     const results = await directionsService.route({
       origin: position,
-      destination: dstTest,
+      destination: destination,
       // eslint-disable-next-line no-undef
       travelMode: google.maps.TravelMode.DRIVING,
     });
@@ -78,45 +87,14 @@ const DriverMap = () => {
   function clearRoute() {
     setDirectionsResponse(null);
     setDistance("");
-    setDuration("");
+    //setDuration("");
   }
-
-  const handleCenterButton = () => {
-    if (map) {
-      map.panTo(position);
-      map.setZoom(18);
-    }
-  };
-
-  if (loadError) {
-    return <div>Map cannot be loaded right now, sorry.</div>;
-  }
-
-  //上、下線
-  const ChangeWorkingStatus = async () => {
-    try {
-      const driver = (await driverAuthService.GetDriver(token)).data;
-      await delieveryService.ChangeWorkingStatus(
-        driver.driverId,
-        position.lng,
-        position.lat
-      );
-      if (workingStatus === false) {
-        setWorkingStatus(true);
-        JoinGroup(driver.id, driver.role);
-      } else {
-        setWorkingStatus(false);
-        LeaveGrop(driver.id, driver.role);
-      }
-    } catch (e) {
-      setErrorMessage(e.response.data.wrongAccountOrPassword[0]);
-    }
-  };
 
   //加入HubGroup
-  async function JoinGroup(id, role) {
+  async function JoinGroup(id) {
     try {
       const driver = (await driverAuthService.GetDriver(token)).data;
+      const role = "driver";
       const connection = new HubConnectionBuilder()
         .withUrl("https://localhost:7093/OrderHub")
         .configureLogging(LogLevel.Information)
@@ -138,24 +116,21 @@ const DriverMap = () => {
       console.log(e);
     }
   }
-  const NewOrder = () => {
-    swal
-      .fire({
-        title: "新訂單!",
-        text: "請至 " + storeAddress + " 取餐",
-        icon: "warning",
-        confirmButtonColor: "#3085d6",
-        cancelButtonColor: "#d33",
-        confirmButtonText: "開始導航",
-        heightAuto: false,
-        width: "20em",
-      })
-      .then(() => {
-        NavationToStore(orderId, driverId);
-        setDriverId(0);
-        console.log("success");
-      });
-  };
+
+  //離開HubGroup
+  async function LeaveGrop(id) {
+    try {
+      const role ="driver" 
+      const connection = new HubConnectionBuilder()
+        .withUrl("https://localhost:7093/OrderHub")
+        .configureLogging(LogLevel.Information)
+        .build();
+
+      await connection.invoke("LeaveGroup", { id, role });
+    } catch (e) {
+      console.log(e);
+    }
+  }
 
   //向餐廳導航
   async function NavationToStore(orderId, driverId) {
@@ -169,41 +144,6 @@ const DriverMap = () => {
       setErrorMessage(e.response.data.errorMessage[0]);
     }
   }
-
-  //離開HubGroup
-  async function LeaveGrop(id, role) {
-    try {
-      const driver = (await driverAuthService.GetDriver(token)).data;
-      const connection = new HubConnectionBuilder()
-        .withUrl("https://localhost:7093/OrderHub")
-        .configureLogging(LogLevel.Information)
-        .build();
-
-      await connection.invoke("LeaveGroup", { id, role });
-    } catch (e) {
-      console.log(e);
-    }
-  }
-
-  const PickUpConfirmation = () => {
-    swal
-      .fire({
-        title: "取餐確認",
-        text: "請至" + { storeName } + "領取" + { orderId } + "號餐點",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonColor: "#3085d6",
-        cancelButtonColor: "#d33",
-        confirmButtonText: "確認餐點無誤，開始外送",
-        heightAuto: false,
-        width: "20em",
-      })
-      .then((result) => {
-        if (result.isConfirmed) {
-          NavationToCustomer(orderId);
-        }
-      });
-  };
 
   //確認取餐，回傳外送地址
   async function NavationToCustomer(orderId) {
@@ -219,27 +159,7 @@ const DriverMap = () => {
     }
   }
 
-  const DeliveryArrive = () => {
-    swal
-      .fire({
-        title: "送達確認",
-        text: "請至將餐點送至" + { customerAddress },
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonColor: "#3085d6",
-        cancelButtonColor: "#d33",
-        confirmButtonText: "確認餐點已送達，通知客戶取餐",
-        heightAuto: false,
-        width: "20em",
-      })
-      .then((result) => {
-        if (result.isConfirmed) {
-          OrderArrive();
-        }
-      });
-  };
-
-  // 餐點抵達
+  //餐點抵達，更新訂單，通知會員
   async function OrderArrive() {
     try {
       clearRoute();
@@ -260,6 +180,106 @@ const DriverMap = () => {
       setErrorMessage(e.response.data.wrongAccountOrPassword[0]);
     }
   }
+
+
+  //(由Button觸發)畫面定位至目前所在位置
+  const handleCenterButton = () => {
+    if (map) {
+      map.panTo(position);
+      map.setZoom(18);
+    }
+  };
+
+  //(由Button觸發)(signalR)上、下線
+  const ChangeWorkingStatus = async () => {
+    try {
+      const driver = (await driverAuthService.GetDriver(token)).data;
+      await delieveryService.ChangeWorkingStatus(
+        driver.driverId,
+        position.lng,
+        position.lat
+      );
+      let timer =null
+      if (workingStatus === false) {
+        setWorkingStatus(true);
+        //每分鐘更新位置
+        timer = setInterval(()=>{
+            delieveryService.UpdateLocation(driver.driverId,position.lng,position.lat)   
+        },60000)
+        JoinGroup(driver.id);
+      } else {
+        setWorkingStatus(false);
+        setDriverId(0)
+        //停止每分鐘更新位置
+        clearInterval(timer)
+        LeaveGrop(driver.id);
+      }
+    } catch (e) {
+      setErrorMessage(e.response.data.wrongAccountOrPassword[0]);
+    }
+  };
+
+  //(swal:由商店觸發)(signalR)接收到新訂單，確認後後回傳商店地址導航資訊
+  const NewOrder = () => {
+    swal
+      .fire({
+        title: "新訂單!",
+        text: "請至 " + storeAddress + " 取餐",
+        icon: "warning",
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "開始導航",
+        heightAuto: false,
+        width: "20em",
+      })
+      .then(() => {
+        NavationToStore(orderId, driverId);
+        setDriverId(0);
+        console.log("success");
+      });
+  };
+
+  //(swal:由Button觸發)確認取餐，回傳外送地址的導航資訊
+  const PickUpConfirmation = () => {
+    swal
+      .fire({
+        title: "取餐確認",
+        text: "請至" + { storeName } + "領取" + { orderId } + "號餐點",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "確認餐點無誤，開始外送",
+        heightAuto: false,
+        width: "20em",
+      })
+      .then((result) => {
+        if (result.isConfirmed) {
+          NavationToCustomer(orderId);
+        }
+      });
+  };
+
+  //(swal:由Button觸發)(signalR)向會員端回報餐點抵達
+  const DeliveryArrive = () => {
+    swal
+      .fire({
+        title: "送達確認",
+        text: "請至將餐點送至" + { customerAddress },
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "確認餐點已送達，通知客戶取餐",
+        heightAuto: false,
+        width: "20em",
+      })
+      .then((result) => {
+        if (result.isConfirmed) {
+          OrderArrive();
+        }
+      });
+  };
 
   return (
     <>
@@ -285,9 +305,9 @@ const DriverMap = () => {
           {!workingStatus && (
             <Button onClick={ChangeWorkingStatus}>上線</Button>
           )}
-          <Button onClick={handleCenterButton}>Center</Button>
-          <Button onClick={PickUpConfirmation}>PickUp</Button>
-          <Button onClick={calculateRoute}>calculateRoute</Button>
+          <Button onClick={handleCenterButton}>置中?</Button>
+          <Button onClick={PickUpConfirmation}>取餐回報</Button>
+          <Button onClick={DeliveryArrive}>餐點送達回報</Button>
         </GoogleMap>
       )}
     </>
