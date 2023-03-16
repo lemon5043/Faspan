@@ -151,7 +151,7 @@ const Home = () => {
           <img className="w-80 mx-auto relative" src={Table} alt="" />
         </div>
       </div>
-      <About />
+      {/* <About /> */}
     </div>
   );
 };

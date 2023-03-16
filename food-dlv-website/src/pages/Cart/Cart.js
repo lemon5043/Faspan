@@ -15,6 +15,7 @@ const Cart = ({ currentUser, storeId }) => {
       .then(function (response) {
         console.log(response.data);
         setCartDetail(response.data[index]);
+        console.log(response.data[index]);
       })
       .catch(function (error) {
         console.log(error);
@@ -89,7 +90,37 @@ const Cart = ({ currentUser, storeId }) => {
   return (
     <div>
       {/* 如果購物車有東西，就顯示資訊 */}
+      {cartDetail.length !== 0 && (
+        <div>
+          <p className="text-3xl font-semibold">{cartDetail.storeName}</p>
+          <button
+            onClick={() => DeleteCart(currentUser.userId, cartDetail.storeId)}
+          >
+            DeleteCart
+          </button>
+          <div>
+            {cartDetail.cartDetails.map((detail) => {
+              return (
+                <div key={detail.identifyNum}>
+                  <p>{detail.productName}</p>
+                  <p>{detail.itemName}</p>
+                  <p>{detail.qty}</p>
+                  <p>{detail.subTotal}</p>
 
+                  {/* 按鈕Update:回到'ProductSelection'頁面, 並記憶該筆商品明細的'客製化選項'與'商品數量' */}
+                  {/* 在該頁面重新選擇完成後, 按鈕'確認修改':onClick={UpdateDetail} */}
+                  <button onClick={null}>Update</button>
+                  <button onClick={() => RemoveDetail(detail.identifyNum)}>
+                    Remove
+                  </button>
+                </div>
+              );
+            })}
+          </div>
+          <p>小計</p>
+          <p>{cartDetail.total}</p>
+        </div>
+      )}
       {cartDetail.length === 0 && (
         <div className="flex justify-center items-center h-screen flex-col">
           <img src={ShoppingCart} alt="shoppingCart.png" className="w-2/3" />

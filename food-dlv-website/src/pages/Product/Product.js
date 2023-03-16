@@ -4,8 +4,7 @@ import StoreService from "../../services/Store/store.service";
 import ProductPage from "./ProductPage";
 import UserAuthService from "../../services/User/userAuth.service";
 
-const Product = () => {
-  let [currentUser] = useState(UserAuthService.getCurrentUser());
+const Product = ({ currentUser }) => {
   const params = useParams();
   const storeId = params.storeId;
   let [data, setData] = useState([]);

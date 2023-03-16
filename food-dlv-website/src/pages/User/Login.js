@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { Label, Input, Button, Box } from "../../components/Style/form-styling";
 import userAuthService from "../../services/User/userAuth.service";
 
-const Login = ({ currentUser, setCurrentUser }) => {
+const Login = ({ setCurrentUser }) => {
   // navigate 是控制重新導向的東西
   const navigate = useNavigate();
   //states

@@ -48,13 +48,14 @@ function App() {
           <Route path="user" element={<User />}></Route>
           <Route
             path="login"
-            currentUser={currentUser}
-            setCurrentUser={setCurrentUser}
-            element={<Login />}
+            element={<Login setCurrentUser={setCurrentUser} />}
           ></Route>
           <Route path="register" element={<Register />}></Route>
           <Route path="store/:addressName" element={<Store />}></Route>
-          <Route path="product/:storeId" element={<Product />}></Route>
+          <Route
+            path="product/:storeId"
+            element={<Product currentUser={currentUser} />}
+          ></Route>
           <Route path="*" element={<Error />}></Route>
         </Route>
         {/* 外送員頁面 */}
