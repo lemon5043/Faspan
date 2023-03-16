@@ -166,40 +166,55 @@ namespace FoodDlvAPI.Models.Repositories
 
         public List<CartDTO> GetCartInfos(int memberId)
         {
-            var carts = _context.Carts                
+            var carts = _context.Carts
                 .Include(c => c.CartDetails)
                 .Where(c => c.MemberId == memberId).ToList();
-            var identifyGroup = carts.SelectMany(c => c.CartDetails).GroupBy(d => d.IdentifyNum);
-            var cartDetail = identifyGroup.Select(gd => new CartDetailDTO
-            {
-                IdentifyNum = gd.Key,
-                ProductId = gd.First().ProductId,
-                ProductName = _context.Products.First(p => p.Id == gd.First().ProductId).ProductName,
-                ItemsId = gd.Select(d => d.ItemId).ToList(),
-                ItemName = string.Join(", ", _context.ProductCustomizationItems
-                    .Where(pci => gd.Select(d => d.ItemId).Contains(pci.Id))
-                    .Select(pci => pci.ItemName).ToList()),
-                Qty = gd.First().Qty,
-                SubTotal = (
-                           _context.Products.Single(p => p.Id == gd.First().ProductId).UnitPrice +
-                           _context.ProductCustomizationItems.Where(pci => gd.Select(d => d.ItemId).Contains(pci.Id)).Sum(pci => pci.UnitPrice)
-                           ) * gd.First().Qty,
-                CartId = gd.First().CartId,
-            }).ToList();
 
             var cartInfos = carts.GroupBy(c => c.StoreId)
                 .Select(gc => new CartDTO
                 {
                     Id = gc.First().Id,
                     MemberId = gc.First().MemberId,
-                    MemberName = _context.Members.Where(m => m.Id == gc.First().MemberId).Select(m => m.FirstName + " " + m.LastName).FirstOrDefault(),
+                    MemberName = _context.Members.Where(m => m.Id == gc.First().MemberId)
+                        .Select(m => m.FirstName + " " + m.LastName).FirstOrDefault(),
                     StoreId = gc.First().StoreId,
-                    StoreName = _context.Stores.First(s => s.Id == gc.First().StoreId).StoreName,
-                    DetailQty = cartDetail.Where(d => d.CartId == gc.First().Id).Sum(d => d.Qty),
-                    Total = cartDetail.Where(d => d.CartId == gc.First().Id).Sum(d => d.SubTotal),
-                    Details = cartDetail,
+                    StoreName = _context.Stores.Where(s => s.Id == gc.First().StoreId).Select(s => s.StoreName).FirstOrDefault(),
+                    DetailQty = gc.SelectMany(c => c.CartDetails).GroupBy(d => d.IdentifyNum).Sum(gd => gd.First().Qty),
+                    Total = gc.SelectMany(c => c.CartDetails).GroupBy(d => d.IdentifyNum).Sum(gd =>
+                    {
+                        var productId = gd.First().ProductId;
+                        var itemsId = gd.Select(d => d.ItemId).ToList();
+                        var productPrice = _context.Products.First(p => p.Id == productId).UnitPrice;
+                        var itemsPrice = _context.ProductCustomizationItems.Where(pci => itemsId.Contains(pci.Id)).Sum(pci => pci.UnitPrice);
+                        var qty = gd.First().Qty;
+
+                        return (productPrice + itemsPrice) * qty;
+                    }),
+
+                    Details = gc.SelectMany(c => c.CartDetails).GroupBy(d => d.IdentifyNum).Select(gd =>
+                    {
+                        var productId = gd.First().ProductId;
+                        var itemsId = gd.Select(d => d.ItemId).ToList();
+                        var productPrice = _context.Products.First(p => p.Id == productId).UnitPrice;
+                        var itemsPrice = _context.ProductCustomizationItems.Where(pci => itemsId.Contains(pci.Id)).Sum(pci => pci.UnitPrice);
+                        var qty = gd.First().Qty;
+
+                        return new CartDetailDTO
+                        {
+                            IdentifyNum = gd.Key,
+                            ProductId = productId,
+                            ProductName = _context.Products.First(p => p.Id == productId).ProductName,
+                            ItemsId = itemsId,
+                            ItemName = string.Join(", ", _context.ProductCustomizationItems
+                                .Where(pci => itemsId.Contains(pci.Id))
+                                .Select(pci => pci.ItemName).ToList()),
+                            Qty = qty,
+                            SubTotal = (productPrice + itemsPrice) * qty,
+                            CartId = gd.First().CartId,
+                        };
+                    }).ToList()
                 }).ToList();
-                        
+
             return cartInfos;
         }
         public void RemoveDetail(int identifyNum)
