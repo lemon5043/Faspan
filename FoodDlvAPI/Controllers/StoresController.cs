@@ -152,7 +152,7 @@ namespace FoodDlvAPI.Controllers
 				getSomeStoresWithDistance.Add(store);
 			}
 
-			var getSomeStoresOrderByDistance = getSomeStoresWithDistance.Where(x => x.Distance != -1).OrderBy(x => x.Distance).Skip((pageNum - 1) * storeNum).Take(storeNum).ToList();
+			var getSomeStoresOrderByDistance = getSomeStoresWithDistance.OrderBy(x => x.Distance).Skip((pageNum - 1) * storeNum).Take(storeNum).ToList();
 			return getSomeStoresOrderByDistance;
 		}
 
@@ -490,8 +490,8 @@ namespace FoodDlvAPI.Controllers
 			query.MarkTime = DateTime.Now;
 
 			_context.Add(query);
-			_context.SaveChanges();
-			return "餐點準備中";
+            await _context.SaveChangesAsync();
+            return "餐點準備中";
 		}
 		////訂單接收拒絕
 		//public async Task<string> DeclineReqAfterGetReq(int orderId)
@@ -546,17 +546,41 @@ namespace FoodDlvAPI.Controllers
 			var store =await _context.Stores.FirstOrDefaultAsync(x => x.Id == storeId);
 
 
-			var deliveryDriver = _context.DeliveryDrivers.Where(x => x.Latitude.HasValue && x.Longitude.HasValue)
-	.AsEnumerable()
-	.OrderBy(x => GetDistanceForStoreToDriver(store.Longitude, store.Latitude, x.Longitude, x.Latitude))
-	.FirstOrDefault();
+         var deliveryDrivers = await _context.DeliveryDrivers.Where(x => x.Latitude.HasValue && x.Longitude.HasValue)
+    .Where(x => x.Longitude != null && x.Latitude != null).ToListAsync();
 
-			if (deliveryDriver == null) throw new Exception("目前沒有可用的外送員");
+
+
+
+			var deliveryDriver = deliveryDrivers.Select(x => new StoreToDeliverVM
+			{
+				Id = x.Id,
+				AccountStatusId = x.AccountStatusId,
+				WorkStatuseId = x.WorkStatuseId,
+				FirstName = x.FirstName,
+				LastName = x.LastName,
+				Phone = x.Phone,
+				BankAccount = x.BankAccount,
+				Idcard = x.Idcard,
+				RegistrationTime = x.RegistrationTime,
+				VehicleRegistration = x.VehicleRegistration,
+				Account = x.Account,
+				Password = x.Password,
+				DriverLicense = x.DriverLicense,
+				Latitude = x.Latitude,
+				Longitude = x.Longitude,
+
+				distance = GetDistanceForStoreToDriver(store.Longitude, store.Latitude, x.Longitude, x.Latitude)
+
+			}).OrderBy(x => x.distance).FirstOrDefault();
+
+
+            if (deliveryDriver == null) throw new Exception("目前沒有可用的外送員");
 			query.StatusId++;
 			query.MarkTime = DateTime.Now;
 
 			_context.Add(query);
-			_context.SaveChanges();
+			await _context.SaveChangesAsync();
 
 			var sendReqToDeliverVM = new SendReqToDeliverVM
 			{
@@ -569,9 +593,14 @@ namespace FoodDlvAPI.Controllers
 
 			return sendReqToDeliverVM;
 		}
-		private async Task<double> GetDistanceForStoreToDriver(double storeLng, double storeLat, double? originLng, double? originLat)
+		private double GetDistanceForStoreToDriver(double storeLng, double storeLat, double? originLng, double? originLat)
 		{
-			double R = 6371; // 地球平均半徑，單位為公里
+
+            if (storeLng == 0 || storeLat == 0 || !originLng.HasValue || !originLat.HasValue)
+            {
+                throw new Exception("傳入經緯度有問題請查詢店家經緯度或是外送員經緯度是否有誤");
+            }
+            double R = 6371; // 地球平均半徑，單位為公里
 
 			
 
