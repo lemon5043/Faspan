@@ -1,5 +1,5 @@
 import { Fragment, useEffect } from "react";
-import ProductSelection from "../../pages/Product/ProductSelection";
+import ProductSelection from "./ProductSelection";
 import { OverlayBg, OverlayMain } from "../Style/overlay-styling";
 
 const ProductOverlay = ({
@@ -10,12 +10,6 @@ const ProductOverlay = ({
   data,
   id,
 }) => {
-  useEffect(() => {
-    console.log(data);
-    console.log(id);
-    console.log(currentUser.userId);
-  }, [id]);
-
   return (
     <Fragment>
       {isOpen && (

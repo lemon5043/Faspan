@@ -6,10 +6,19 @@ const Item = ({ item, toggleItem }) => {
   }
 
   return (
-    <div>
-      <input type="checkbox" onChange={handleItemClick} />
-      <p>{item.itemName}</p>
-      <p>{item.customizationItemPrice}</p>
+    <div className="flex justify-between">
+      <div className="flex my-3">
+        <input
+          className="w-4"
+          type="checkbox"
+          name={item.itemName}
+          onChange={handleItemClick}
+        />
+        <label className="pl-3" htmlFor={item.itemName}>
+          {item.itemName}
+        </label>
+      </div>
+      <p className="text-slate-500">${item.customizationItemPrice}</p>
     </div>
   );
 };

@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import BgImage from "../../components/Product/BgImage";
 import ProductDisplay from "../../components/Product/ProductDisplay";
 import StoreInfo from "../../components/Product/StoreInfo";
-import ProductOverlay from "../../components/Product/ProductOverlay";
+import ProductOverlay from "../../components/ProductSelection/ProductOverlay";
 import useOverlay from "../../hooks/useOverlay";
 
 const ProductPage = ({ data, currentUser }) => {

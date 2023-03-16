@@ -1,30 +1,45 @@
 import { useEffect, useState } from "react";
 import ProductSelectionService from "../../services/Cart/productSelection.service";
 import CartService from "../../services/Cart/cart.service";
-import ProductInfo from "../../components/ProductSelection/ProductInfo";
-import List from "../../components/ProductSelection/List";
+import ProductInfo from "./ProductInfo";
+import List from "./List";
+import { Btn } from "../Style/button-styling";
+import AddIcon from "@mui/icons-material/Add";
+import RemoveIcon from "@mui/icons-material/Remove";
+import { useNavigate } from "react-router-dom";
+import Swal from "sweetalert2";
 
-const ProductSelection = ({ data, productId, currentUser }) => {
-  const memberId = currentUser.userId;
+const ProductSelection = ({ productId, currentUser }) => {
   const [product, setProduct] = useState(null);
   const [selectItems, setSelectItems] = useState([]);
   const [qty, setQty] = useState(1);
 
+  const navigate = useNavigate();
+
+  // 點擊後彈出視窗顯示產品內容
   async function getProduct() {
     try {
       const response = await ProductSelectionService.getProductSelect(
         productId
       );
       setProduct(response.data);
-      console.log(response.data);
     } catch (error) {
       console.log(error);
     }
   }
 
-  function numberQty(e) {
-    setQty(parseInt(e.target.value));
-  }
+  const minusOne = () => {
+    if (qty === 1) return;
+    setQty((currentQty) => {
+      return currentQty - 1;
+    });
+  };
+
+  const plusOne = () => {
+    setQty((currentQty) => {
+      return currentQty + 1;
+    });
+  };
 
   const toggleItem = (id) => {
     const newitems = [...selectItems];
@@ -37,9 +52,24 @@ const ProductSelection = ({ data, productId, currentUser }) => {
   };
 
   function AddToCart() {
-    console.log(memberId, product.storeId, productId, selectItems, qty);
+    if (!currentUser) {
+      Swal.fire({
+        text: "請先登入才能點餐喔!",
+        heightAuto: false,
+        showCancelButton: true,
+        confirmButtonColor: "#050505",
+        cancelButtonColor: "#aeb2b6",
+        confirmButtonText: "登入",
+        cancelButtonText: "取消",
+      }).then((result) => {
+        if (result.isConfirmed) {
+          navigate("/login");
+        }
+      });
+      return;
+    }
     CartService.postAddToCart(
-      memberId,
+      currentUser.userId,
       product.storeId,
       productId,
       selectItems,
@@ -65,11 +95,14 @@ const ProductSelection = ({ data, productId, currentUser }) => {
           <ProductInfo product={product} />
           {/* 增加客製化選項的 checkbox */}
           <List items={product.customizationItems} toggleItem={toggleItem} />
-          <div>
-            <label>Quantity:</label>
-            <input type="number" value={qty} min={1} onChange={numberQty} />
+          <div className="flex justify-between items-center p-4">
+            <div className="flex items-center">
+              <RemoveIcon onClick={minusOne} className="cursor-pointer m-2" />
+              <span className="text-slate-700 font-bold text-lg">{qty}</span>
+              <AddIcon onClick={plusOne} className="cursor-pointer m-2" />
+            </div>
+            <Btn onClick={AddToCart}>AddToCart</Btn>
           </div>
-          <button onClick={AddToCart}>AddToCart</button>
         </div>
       )}
     </div>

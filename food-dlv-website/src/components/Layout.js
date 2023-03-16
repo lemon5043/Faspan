@@ -14,9 +14,8 @@ import userAuthService from "../services/User/userAuth.service";
 import { DropdownItem, DropdownMenu, Trigger } from "./Style/dropdown-styling";
 import { LayoutBtn } from "./Style/button-styling";
 // mui
-import { styled, useTheme } from "@mui/material/styles";
+import { useTheme } from "@mui/material/styles";
 import Drawer from "@mui/material/Drawer";
-import Divider from "@mui/material/Divider";
 import Cart from "../pages/Cart/Cart";
 
 //mui
@@ -61,7 +60,7 @@ const Layout = ({ currentUser, setCurrentUser }) => {
   const [open, setOpen] = React.useState(false);
 
   const handleDrawerOpen = () => {
-    setOpen(true);
+    if (currentUser) setOpen(true);
   };
 
   const handleDrawerClose = () => {

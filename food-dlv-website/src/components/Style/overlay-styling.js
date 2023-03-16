@@ -19,7 +19,7 @@ export const OverlayMain = styled.div`
   right: 0;
   margin: auto;
   z-index: 30;
-  padding: 1.75rem;
   height: fit-content;
   width: 37.5rem;
+  border-radius: 0.5rem;
 `;
