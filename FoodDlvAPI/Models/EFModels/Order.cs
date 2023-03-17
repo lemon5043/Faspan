@@ -28,10 +28,10 @@ namespace FoodDlvAPI.Models
         public string DeliveryAddress { get; set; }
         public int? DriverRating { get; set; }
         public int? StoreRating { get; set; }
-        public string DriverComment { get; set; }
-        public string StoreComment { get; set; }
+        public string? DriverComment { get; set; }
+        public string? StoreComment { get; set; }
         public decimal Milage { get; set; }
-        public bool CreateMark { get; set; }
+        public bool? CreateMark { get; set; }
         public virtual DeliveryDriver DeliveryDrivers { get; set; }
         public virtual Member Member { get; set; }
         public virtual Store Store { get; set; }

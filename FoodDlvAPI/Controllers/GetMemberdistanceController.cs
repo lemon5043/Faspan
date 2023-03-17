@@ -19,7 +19,7 @@ namespace FoodDlvAPI.Controllers
             _context = context;
         }
         [HttpGet("GetMemberLongitudeNLatitude")]
-        public async Task<List<double>> GetMemberLongitudeNLatitude(long cartId)
+        public async Task<List<double>> GetMemberLongitudeNLatitude(int addressId)
         {
             //if (_context.Orders == null) throw new Exception("抱歉找不到訂單，請確認後再試一次");
             //if (address == null) throw new Exception("抱歉，找不到地址，請確認後再試一次");
@@ -32,8 +32,8 @@ namespace FoodDlvAPI.Controllers
             //            //MemberId = x.MemberId,
             //            Address = _context.AccountAddresses.First(a => x.MemberId == a.MemberId).Address,
             //        }).FirstOrDefaultAsync();
-            var memberId = await _context.Carts.Where(c => c.Id == cartId).Select(c => c.MemberId).FirstOrDefaultAsync();
-            var address = await _context.AccountAddresses.Where(aa => aa.MemberId == memberId).Select(aa => aa.Address).FirstOrDefaultAsync();
+            //var memberId = await _context.Carts.Where(c => c.Id == cartId).Select(c => c.MemberId).FirstOrDefaultAsync();
+            var address = await _context.AccountAddresses.Where(aa => aa.Id == addressId).Select(aa => aa.Address).FirstOrDefaultAsync();
 
             var apiKey = await _context.Apis.Where(x => x.Id == 1).Select(x => x.Apikey).FirstOrDefaultAsync();
             var url = $"https://maps.googleapis.com/maps/api/geocode/json?address={address}&key={apiKey}";
@@ -64,9 +64,9 @@ namespace FoodDlvAPI.Controllers
         }
 
         [HttpGet("CalculateDistance")]
-        public async Task<double> CalculateDistance(long cartId)
+        public async Task<double> CalculateDistance(long cartId, int addressId)
         {
-            var MemberLongitudeNLatitude = await GetMemberLongitudeNLatitude(cartId);
+            var MemberLongitudeNLatitude = await GetMemberLongitudeNLatitude(addressId);
             var MemberLongitude = MemberLongitudeNLatitude[0];
             var MemberLatitude = MemberLongitudeNLatitude[1];
 
@@ -83,9 +83,9 @@ namespace FoodDlvAPI.Controllers
         }
         //    //計算外送費
         [HttpGet("GetDeliveryFee")]
-        public async Task<decimal> GetDeliveryFee(long cartId)
+        public async Task<decimal> GetDeliveryFee(long cartId, int addressId)
         {
-            var distance = await CalculateDistance(cartId);
+            var distance = await CalculateDistance(cartId, addressId);
             decimal feePerKm;
             if (distance < 1)
             {

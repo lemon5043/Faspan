@@ -225,5 +225,17 @@ namespace FoodDlvAPI.Models.Repositories
             _context.CartDetails.RemoveRange(target);
             _context.SaveChanges();
         }
+
+        public CartDTO CheckOutCart(long cartId)
+        {
+            var data = _context.Carts
+                .AsNoTracking()
+                .Include(c => c.CartDetails)
+                .Where(c => c.Id == cartId)
+                .First()
+                .ToCartDTO();
+
+            return data;
+        }
     }
 }

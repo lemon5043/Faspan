@@ -11,14 +11,15 @@ namespace FoodDlvAPI.Models.DTOs
         public int StoreId { get; set; }
         public string? StoreName { get; set; }
         public int DeliveryFee { get; set; }
-        public int DetailQty { get; set; }
-        public int Total { get; set; }
+        public int? DetailQty { get; set; }
+        public int? Total { get; set; }
         public string? DeliveryAddress { get; set; }
         public int? DriverRating { get; set; }
         public int? StoreRating { get; set; }
         public string? DriverComment { get; set; }
         public string? StoreComment { get; set; }
-        public decimal? Milage { get; set; }
+        public decimal Milage { get; set; }
+        public bool CreateMark { get; set; }
         public CartDTO? Cart { get; set; }
         public List<OrderDetailDTO>? Details { get; set; }
         public List<OrderScheduleDTO>? Schedules { get; set; }
@@ -48,12 +49,14 @@ namespace FoodDlvAPI.Models.DTOs
         public static Order ToOrderEF(this OrderDTO source)
         {
             var orderEF = new Order
-            {
-                Id = source.Id,
+            {                
                 MemberId = source.MemberId,
                 StoreId = source.StoreId,
                 DeliveryFee = source.DeliveryFee,
-                OrderDetails = source.Details.Select(d => d.ToOrderDetailEF()).ToList(),
+                DeliveryAddress = source.DeliveryAddress,
+                Milage = source.Milage,
+                CreateMark = source.CreateMark,
+                //OrderDetails = source.Details.Select(d => d.ToOrderDetailEF()).ToList(),
             };
             return orderEF;
         }
