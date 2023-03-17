@@ -2,14 +2,14 @@ import { useState, useEffect } from "react";
 
 import CartService from "../../services/Cart/cart.service";
 import ShoppingCart from "../../assets/images/shopping_cart.png";
-import { LayoutBtn } from "../../components/Style/button-styling";
-import { Link } from "react-router-dom";
+import { LayoutBtn, Btn } from "../../components/Style/button-styling";
+import { Link, useNavigate } from "react-router-dom";
 import useCart from "../../hooks/useCart";
 
 const Cart = ({ currentUser, storeId }) => {
   const { cartDetail, setCartDetail, CartInfo } = useCart();
-
   const [identifyNum, setIdentifyNum] = useState("");
+  const navigate = useNavigate();
 
   //展示購物車內容
 
@@ -84,6 +84,11 @@ const Cart = ({ currentUser, storeId }) => {
       });
   }
 
+  const checkoutHandler = () => {
+    if (cartDetail.length === 0) return;
+    navigate("/checkout/" + cartDetail.cartDetails[0].cartId);
+  };
+
   return (
     <div>
       {/* 如果購物車有東西，就顯示資訊 */}
@@ -131,6 +136,9 @@ const Cart = ({ currentUser, storeId }) => {
               );
             })}
           </div>
+          <Btn onClick={checkoutHandler} className="w-full mt-4">
+            結帳
+          </Btn>
         </div>
       )}
       {/* 購物車沒東西時顯示的畫面 */}

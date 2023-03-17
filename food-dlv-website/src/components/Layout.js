@@ -23,9 +23,15 @@ import userAddressService from "../services/User/userAddress.service";
 //mui
 const drawerWidth = 360;
 
-const Layout = ({ currentUser, setCurrentUser }) => {
+const Layout = ({
+  currentUser,
+  setCurrentUser,
+  currentAddress,
+  setCurrentAddress,
+  currentAddressId,
+  setCurrentAddressId,
+}) => {
   const navigate = useNavigate();
-  let [address, setAddress] = useState("");
   const { isOpen, setIsOpen, toggleOverlay, bubblePreventer } = useOverlay();
 
   const logoutHandler = () => {
@@ -55,8 +61,8 @@ const Layout = ({ currentUser, setCurrentUser }) => {
   };
 
   const searchHandler = () => {
-    if (address === "") return;
-    navigate("/store/" + address);
+    if (currentAddress === "") return;
+    navigate("/store/" + currentAddress);
     toggleOverlay();
   };
   const [open, setOpen] = React.useState(false);
@@ -71,7 +77,9 @@ const Layout = ({ currentUser, setCurrentUser }) => {
 
   const DisplayAddress = async () => {
     const response = await userAddressService.getAddress(currentUser.userId);
-    setAddress(response.data[0].address);
+    setCurrentAddress(response.data[0].address);
+    setCurrentAddressId(response.data[0].id);
+    localStorage.setItem("addressId", JSON.stringify(response.data[0].id));
   };
   useEffect(() => {
     DisplayAddress();
@@ -98,14 +106,14 @@ const Layout = ({ currentUser, setCurrentUser }) => {
             </Link>
             {/* 搜尋欄 */}
             <LayoutBtn className="ml-16" onClick={toggleOverlay}>
-              {address}
+              {currentAddress}
             </LayoutBtn>
             <AddressOverlay
               isOpen={isOpen}
               toggleOverlay={toggleOverlay}
               bubblePreventer={bubblePreventer}
               currentUser={currentUser}
-              setAddress={setAddress}
+              setCurrentAddress={setCurrentAddress}
               enterHandler={enterHandler}
               searchHandler={searchHandler}
               magnifyingGlass={magnifyingGlass}

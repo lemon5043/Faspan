@@ -12,6 +12,7 @@ import Error from "./pages/Error";
 import Home from "./pages/Home/Home";
 import Store from "./pages/Store/Store";
 import Product from "./pages/Product/Product";
+import Checkout from "./pages/Checkout";
 // *外送員介面
 //layout
 import DriverLayout from "./components/DriverLayout";
@@ -29,11 +30,17 @@ import "./assets/styles/tailwind.css";
 //services
 import UserAuthService from "./services/User/userAuth.service";
 import Test from "./pages/___test___/Sidebar.test";
+import UserAddressService from "./services/User/userAddress.service";
 
 function App() {
   let [currentUser, setCurrentUser] = useState(
     UserAuthService.getCurrentUser()
   );
+  const [currentAddress, setCurrentAddress] = useState("");
+  const [currentAddressId, setCurrentAddressId] = useState(
+    UserAddressService.getCurrentAddress()
+  );
+
   return (
     <BrowserRouter>
       <Routes>
@@ -41,7 +48,14 @@ function App() {
         <Route
           path="/"
           element={
-            <Layout currentUser={currentUser} setCurrentUser={setCurrentUser} />
+            <Layout
+              currentUser={currentUser}
+              setCurrentUser={setCurrentUser}
+              currentAddress={currentAddress}
+              setCurrentAddress={setCurrentAddress}
+              currentAddressId={currentAddressId}
+              setCurrentAddressId={setCurrentAddressId}
+            />
           }
         >
           <Route index element={<Home />}></Route>
@@ -58,6 +72,16 @@ function App() {
           ></Route>
           <Route path="*" element={<Error />}></Route>
         </Route>
+        <Route
+          path="checkout/:cartId"
+          element={
+            <Checkout
+              currentUser={currentUser}
+              currentAddress={currentAddress}
+              currentAddressId={currentAddressId}
+            />
+          }
+        ></Route>
         {/* 外送員頁面 */}
         {/* 註冊登入 */}
         <Route path="/test" element={<Test />}></Route>

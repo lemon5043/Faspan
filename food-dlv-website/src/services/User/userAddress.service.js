@@ -13,6 +13,11 @@ class UserAddressService {
     );
     return respones;
   }
+
+  getCurrentAddress() {
+    const data = JSON.parse(localStorage.getItem("addressId"));
+    return data;
+  }
 }
 
 export default new UserAddressService();

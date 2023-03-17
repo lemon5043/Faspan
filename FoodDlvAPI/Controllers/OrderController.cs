@@ -8,7 +8,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace FoodDlvAPI.Controllers
 {
-    public class OrderController : Controller
+	[Route("api/[controller]")]
+	[ApiController]
+	public class OrderController : Controller
     {
         //Fields
         private readonly AppDbContext _context;

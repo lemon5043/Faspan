@@ -23,6 +23,7 @@ class UserAuthService {
 
   logout() {
     localStorage.removeItem("user");
+    localStorage.removeItem("addressId");
   }
 }
 
