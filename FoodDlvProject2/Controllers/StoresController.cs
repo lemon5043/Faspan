@@ -44,13 +44,17 @@ namespace FoodDlvProject2.Controllers
 			{
 				return NotFound();
 			}
-
+			ViewBag.Apikey = _context.Apis.Where(x => x.Id == 1).FirstOrDefault().Apikey;
 			return View(store);
 		}
 
 		// GET: Stores/Create
 		public IActionResult Create()
 		{
+
+
+
+
 			ViewBag.Apikey = _context.Apis.Where(x=>x.Id==1).FirstOrDefault().Apikey;
 			ViewData["StorePrincipalId"] = new SelectList(_context.StorePrincipals, "Id", "Account");
 			return View();
