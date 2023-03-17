@@ -1,5 +1,5 @@
 import { Outlet, Link, useNavigate, useSearchParams } from "react-router-dom";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 // icons
 import Logo from "../assets/images/logo.svg";
 import bag from "../assets/icons/bag.svg";
@@ -14,9 +14,11 @@ import userAuthService from "../services/User/userAuth.service";
 import { DropdownItem, DropdownMenu, Trigger } from "./Style/dropdown-styling";
 import { LayoutBtn } from "./Style/button-styling";
 // mui
-import { useTheme } from "@mui/material/styles";
 import Drawer from "@mui/material/Drawer";
 import Cart from "../pages/Cart/Cart";
+import useOverlay from "../hooks/useOverlay";
+import AddressOverlay from "../pages/User/AddressOverlay";
+import userAddressService from "../services/User/userAddress.service";
 
 //mui
 const drawerWidth = 360;
@@ -24,6 +26,7 @@ const drawerWidth = 360;
 const Layout = ({ currentUser, setCurrentUser }) => {
   const navigate = useNavigate();
   let [address, setAddress] = useState("");
+  const { isOpen, setIsOpen, toggleOverlay, bubblePreventer } = useOverlay();
 
   const logoutHandler = () => {
     Swal.fire({
@@ -54,9 +57,8 @@ const Layout = ({ currentUser, setCurrentUser }) => {
   const searchHandler = () => {
     if (address === "") return;
     navigate("/store/" + address);
+    toggleOverlay();
   };
-
-  const theme = useTheme();
   const [open, setOpen] = React.useState(false);
 
   const handleDrawerOpen = () => {
@@ -66,6 +68,14 @@ const Layout = ({ currentUser, setCurrentUser }) => {
   const handleDrawerClose = () => {
     setOpen(false);
   };
+
+  const DisplayAddress = async () => {
+    const response = await userAddressService.getAddress(currentUser.userId);
+    setAddress(response.data[0].address);
+  };
+  useEffect(() => {
+    DisplayAddress();
+  }, []);
 
   return (
     <div>
@@ -87,24 +97,19 @@ const Layout = ({ currentUser, setCurrentUser }) => {
               </div>
             </Link>
             {/* 搜尋欄 */}
-            <div className="pl-16 relative text-gray-600 flex items-center">
-              <input
-                onChange={(e) => setAddress(e.target.value)}
-                onKeyDown={enterHandler}
-                className="border-2 border-gray-300 bg-white h-10 w-80 px-2 rounded-lg text-sm focus:border-neutral-400 focus:ring-neutral-300 focus:outline-none focus:ring focus:ring-opacity-40"
-                type="address"
-                name="address"
-                placeholder="要送到哪呢"
-              />
-              <button className="absolute right-0 top-0 mr-3">
-                <img
-                  onClick={searchHandler}
-                  src={magnifyingGlass}
-                  alt="magnifyingGlass.svg"
-                  className="py-3 w-4"
-                />
-              </button>
-            </div>
+            <LayoutBtn className="ml-16" onClick={toggleOverlay}>
+              {address}
+            </LayoutBtn>
+            <AddressOverlay
+              isOpen={isOpen}
+              toggleOverlay={toggleOverlay}
+              bubblePreventer={bubblePreventer}
+              currentUser={currentUser}
+              setAddress={setAddress}
+              enterHandler={enterHandler}
+              searchHandler={searchHandler}
+              magnifyingGlass={magnifyingGlass}
+            />
           </li>
 
           {/* 導覽列右側 nav */}

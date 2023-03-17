@@ -3,8 +3,8 @@ import { useState } from "react";
 const useOverlay = () => {
   const [isOpen, setIsOpen] = useState(false);
 
-  const toggleOverlay = (e) => {
-    setIsOpen(!isOpen);
+  const toggleOverlay = () => {
+    setIsOpen((currentOpen) => !currentOpen);
   };
 
   const bubblePreventer = (e) => {

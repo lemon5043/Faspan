@@ -2,14 +2,12 @@ import { useState } from "react";
 import CartService from "../services/Cart/cart.service";
 
 const useCart = () => {
-  const [cartDetail, setCartDetail] = useState([]);
-  const [refreshCart, setRefreshCart] = useState("");
+  let [cartDetail, setCartDetail] = useState([]);
 
   //展示購物車內容
   async function CartInfo(index, userId) {
     try {
       const response = await CartService.getCartInfo(userId);
-      console.log(response.data);
       if (response.data.length !== 0) {
         setCartDetail(response.data[index]);
         return;
@@ -20,7 +18,11 @@ const useCart = () => {
     }
   }
 
-  return { cartDetail, setCartDetail, CartInfo, refreshCart, setRefreshCart };
+  return {
+    cartDetail,
+    setCartDetail,
+    CartInfo,
+  };
 };
 
 export default useCart;

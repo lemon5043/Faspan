@@ -7,38 +7,34 @@ import { Link } from "react-router-dom";
 import useCart from "../../hooks/useCart";
 
 const Cart = ({ currentUser, storeId }) => {
-  const { cartDetail, setCartDetail, CartInfo, refreshCart, setRefreshCart } =
-    useCart();
+  const { cartDetail, setCartDetail, CartInfo } = useCart();
 
   const [identifyNum, setIdentifyNum] = useState("");
 
   //展示購物車內容
 
   //條件:剛開啟網頁時改變購物車的內容
-  useEffect(function () {
+  useEffect(() => {
     if (currentUser) {
       CartInfo(0, currentUser.userId);
     }
   }, []);
 
   //條件:在cartDetail改變時, 重新獲取購物車的產品明細
-  useEffect(
-    function () {
-      if (currentUser) {
-        CartInfo(0, currentUser.userId);
-      } else {
-        setCartDetail([]);
-      }
-    },
-    [currentUser]
-  );
-
-  useEffect(
-    function () {
+  useEffect(() => {
+    if (currentUser) {
       CartInfo(0, currentUser.userId);
-    },
-    [refreshCart]
-  );
+    }
+  }, [cartDetail]);
+
+  //條件:切換使用者時, 重新獲取購物車的產品明細
+  useEffect(() => {
+    if (currentUser) {
+      CartInfo(0, currentUser.userId);
+    } else {
+      setCartDetail([]);
+    }
+  }, [currentUser]);
 
   //修改購物車'被選取'商品明細
   function UpdateDetail(detail) {
@@ -92,46 +88,63 @@ const Cart = ({ currentUser, storeId }) => {
     <div>
       {/* 如果購物車有東西，就顯示資訊 */}
       {cartDetail && cartDetail.length !== 0 && (
-        <div>
-          <p className="text-3xl font-semibold">{cartDetail.storeName}</p>
+        <div className="mx-2">
+          <p className="text-3xl mb-2 font-semibold">{cartDetail.storeName}</p>
+          {/* 清空購物車 */}
           <button
             onClick={() => DeleteCart(currentUser.userId, cartDetail.storeId)}
+            className="text-red-600 pb-4"
           >
-            DeleteCart
+            清空購物車
           </button>
+          <div className="flex justify-between pb-3 border-b-2">
+            <p>
+              <span className="font-bold">{cartDetail.qty}</span>項商品
+            </p>
+            <p>
+              小計: <span className="font-bold">${cartDetail.total}</span>
+            </p>
+          </div>
           <div>
             {cartDetail.cartDetails.map((detail) => {
               return (
-                <div key={detail.identifyNum}>
-                  <p>{detail.productName}</p>
-                  <p>{detail.itemName}</p>
-                  <p>{detail.qty}</p>
-                  <p>{detail.subTotal}</p>
+                <div key={detail.identifyNum} className="border-b-2 py-2">
+                  <p className="text-lg pb-2">{detail.productName}</p>
+                  <p className="pb-2">{detail.itemName}</p>
+                  <div className="flex justify-between">
+                    <p>{detail.qty} 項</p>
+                    <p>$ {detail.subTotal}</p>
+                  </div>
 
                   {/* 按鈕Update:回到'ProductSelection'頁面, 並記憶該筆商品明細的'客製化選項'與'商品數量' */}
                   {/* 在該頁面重新選擇完成後, 按鈕'確認修改':onClick={UpdateDetail} */}
-                  <button onClick={null}>Update</button>
-                  <button onClick={() => RemoveDetail(detail.identifyNum)}>
-                    Remove
-                  </button>
+                  <div className="flex justify-between">
+                    <button onClick={null}>更新</button>
+                    <button
+                      className="text-red-600"
+                      onClick={() => RemoveDetail(detail.identifyNum)}
+                    >
+                      刪除
+                    </button>
+                  </div>
                 </div>
               );
             })}
           </div>
-          <p>小計</p>
-          <p>{cartDetail.total}</p>
         </div>
       )}
-      {cartDetail.length === 0 && (
-        <div className="flex justify-center items-center h-screen flex-col">
-          <img src={ShoppingCart} alt="shoppingCart.png" className="w-2/3" />
-          <h2 className="text-xl font-bold my-2">購物車是空的!</h2>
-          <p className="mb-4">來把錢錢變成喜歡的東西吧~</p>
-          <LayoutBtn>
-            <Link to="/store">開逛</Link>
-          </LayoutBtn>
-        </div>
-      )}
+      {/* 購物車沒東西時顯示的畫面 */}
+      {!cartDetail ||
+        (cartDetail.length === 0 && (
+          <div className="flex justify-center items-center h-screen flex-col">
+            <img src={ShoppingCart} alt="shoppingCart.png" className="w-2/3" />
+            <h2 className="text-xl font-bold my-2">購物車是空的!</h2>
+            <p className="mb-4">來把錢錢變成喜歡的東西吧~</p>
+            <LayoutBtn>
+              <Link to="/store">開逛</Link>
+            </LayoutBtn>
+          </div>
+        ))}
     </div>
   );
 };

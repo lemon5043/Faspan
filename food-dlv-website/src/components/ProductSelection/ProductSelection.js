@@ -14,9 +14,7 @@ const ProductSelection = ({ productId, currentUser, onClose }) => {
   const [product, setProduct] = useState(null);
   const [selectItems, setSelectItems] = useState([]);
   const [qty, setQty] = useState(1);
-
   const navigate = useNavigate();
-  const { refreshCart, setRefreshCart } = useCart();
 
   // 點擊後彈出視窗顯示產品內容
   async function getProduct() {
@@ -78,8 +76,6 @@ const ProductSelection = ({ productId, currentUser, onClose }) => {
         selectItems,
         qty
       );
-      setRefreshCart("123");
-      console.log(refreshCart);
       Swal.fire({
         title: "已加入購物車!",
         icon: "success",
@@ -97,6 +93,7 @@ const ProductSelection = ({ productId, currentUser, onClose }) => {
 
   return (
     <div>
+      <button>123</button>
       {product && (
         <div>
           {/* 紀錄產品訊息 */}
