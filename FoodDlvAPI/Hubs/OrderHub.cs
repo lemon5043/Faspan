@@ -58,7 +58,7 @@ namespace FoodDlvAPI.Hubs
         /// <returns></returns>
         public async Task NewOrder(int StordId, int orderId)
         {
-            string groupName = "Store" + StordId.ToString();
+            string groupName = "store" + StordId.ToString();
             await Clients.Group(groupName).SendAsync("NewOrder", orderId);
         }
 
@@ -71,7 +71,7 @@ namespace FoodDlvAPI.Hubs
         /// <returns></returns>
         public async Task AssignOrder(int DriverId, int orderId)
         {
-            string groupName = "Driver" + DriverId.ToString();
+            string groupName = "driver" + DriverId.ToString();
             await Clients.Group(groupName).SendAsync("AssignOrder", orderId);
         }
 
@@ -84,7 +84,7 @@ namespace FoodDlvAPI.Hubs
         /// <returns></returns>
         public async Task DeclineOrder(int StordId, int orderId)
         {
-            string groupName = "Store" + StordId.ToString();
+            string groupName = "store" + StordId.ToString();
             await Clients.Group(groupName).SendAsync("DeclineOrder", orderId);
         }
 
@@ -97,7 +97,7 @@ namespace FoodDlvAPI.Hubs
         /// <returns></returns>
         public async Task OrderArrive(int MemberId, int orderId)
         {
-            string groupName = "Member" + MemberId.ToString();
+            string groupName = "member" + MemberId.ToString();
             await Clients.Group(groupName).SendAsync("OrderArrive", orderId);
         }
     }

@@ -48,7 +48,8 @@ async function LinkStart(memberId) {
         .withUrl("https://localhost:7093/OrderHub")
         .configureLogging(LogLevel.Information)
         .build();
-
+        
+      await connection.start();
       await connection.invoke("LeaveGroup", { memberId, role });
     } catch (e) {
       console.log(e);
@@ -104,7 +105,7 @@ async function JoinGroup(storeId) {
         .withUrl("https://localhost:7093/OrderHub")
         .configureLogging(LogLevel.Information)
         .build();
-
+      await connection.start();
       await connection.invoke("LeaveGroup", { storeId, role });
     } catch (e) {
       console.log(e);
