@@ -21,9 +21,11 @@ namespace FoodDlvAPI.Controllers
             _context = context;
             IOrderRepository orderRepo = new OrderRepository(_context);
             ICartRepository cartRepo = new CartRepository(_context);
+            IProductRepository productRepo = new ProductRepository(_context);
             
 
             this._orderService = new OrderService(orderRepo, cartRepo);
+            this._cartService = new CartService(cartRepo, productRepo);
         }
 
         [HttpGet("OrderInfo")]
@@ -48,7 +50,7 @@ namespace FoodDlvAPI.Controllers
             {
 
                 _cartService.CheckOutCart(memberId, storeId);
-                _orderService.CheckOutTime(storeId);
+                //_orderService.CheckOutTime(storeId);
                 _orderService.OrderEstablished(memberId, storeId, fee, address);
                 return new EmptyResult();
             }

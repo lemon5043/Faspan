@@ -45,7 +45,7 @@ namespace FoodDlvAPI.Hubs
         //{
         //    if (_connections.TryGetValue(Context.ConnectionId, out UserConnection userConnection))
         //    {
-        //        await Clients.Group(userConnection.Room).SendAsync("ReceiveOrderId", userConnection.Room, mesage);
+        //        await Clients.Group(userConnection.Room).SendAsync("ReceiveOrderId", userConnection.Room, message);
         //    }
         //}
 

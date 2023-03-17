@@ -96,7 +96,7 @@ namespace FoodDlvAPI.Models.Repositories
 
         public void CreateNewOrder(int memberId, int storeId, int fee, string address)
         {
-            var cart = _context.Carts.First(c => c.Id == memberId && c.StoreId == storeId);
+            var cart = _context.Carts.Include(c=> c.CartDetails).FirstOrDefault(c => c.Id == memberId && c.StoreId == storeId);
             var order = new OrderDTO
             {
                 MemberId = cart.MemberId,

@@ -93,7 +93,6 @@ const ProductSelection = ({ productId, currentUser, onClose }) => {
 
   return (
     <div>
-      <button>123</button>
       {product && (
         <div>
           {/* 紀錄產品訊息 */}
