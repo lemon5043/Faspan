@@ -3,6 +3,7 @@ using FoodDlvAPI.Interfaces;
 using FoodDlvAPI.Models;
 using FoodDlvAPI.Models.DTOs;
 using Microsoft.EntityFrameworkCore;
+using System;
 
 namespace FoodDlvAPI.Models.Repositories
 {
@@ -12,7 +13,7 @@ namespace FoodDlvAPI.Models.Repositories
         private readonly AppDbContext _context;
         private readonly ICartRepository _cartRepository;
         private readonly GetMemberdistanceController _addressClac;
-      
+
 
         //Constructors
         public OrderRepository(AppDbContext context)
@@ -24,14 +25,14 @@ namespace FoodDlvAPI.Models.Repositories
 
 
         public OrderDTO GetOrderInfo(long cartId, int addressId)
-        {         
-            int memberId = _context.Carts.First(c => c.Id == cartId).MemberId;                    
+        {
+            int memberId = _context.Carts.First(c => c.Id == cartId).MemberId;
 
             var orderInfo = new OrderDTO()
             {
                 Cart = _cartRepository.GetCartInfos(memberId).First(c => c.Id == cartId),
                 DeliveryAddress = _context.AccountAddresses.First(aa => aa.Id == addressId).Address,
-                DeliveryFee = Convert.ToInt32(_addressClac.GetDeliveryFee(cartId).Result),
+                DeliveryFee = Convert.ToInt32(_addressClac.GetDeliveryFee(cartId, addressId).Result),
             };
             return orderInfo;
         }
@@ -40,13 +41,13 @@ namespace FoodDlvAPI.Models.Repositories
         {
             var nowTime = DateTime.Now.TimeOfDay;
             int nowDay = Convert.ToInt32(DateTime.Now.DayOfWeek);
-            
+
             var storeState = _context.StorePrincipals.First(sp => sp.Id == _context.Stores.First(s => s.Id == storeId).StorePrincipalId).AccountStatusId == 2;
 
             if (storeState)
             {
                 var targetStore = _context.StoreBusinessHours.Where(sbh => sbh.StoreId == storeId).ToList();
-                if (targetStore == null) 
+                if (targetStore == null)
                 {
                     return;
                 }
@@ -59,7 +60,7 @@ namespace FoodDlvAPI.Models.Repositories
             else
             {
                 throw new Exception("目前剛商家非營業狀態");
-            }           
+            }
         }
 
         public void CashTransfer(int memberId, int storeId, int fee)
@@ -94,95 +95,141 @@ namespace FoodDlvAPI.Models.Repositories
             }
         }
 
-        public void CreateNewOrder(int memberId, int storeId, int fee, string address)
+        public void CreateNewOrder(int memberId, int storeId, int fee, int addressId)
         {
-            var cart = _context.Carts.Include(c=> c.CartDetails).FirstOrDefault(c => c.Id == memberId && c.StoreId == storeId);
-            var order = new OrderDTO
+            try
             {
-                MemberId = cart.MemberId,
-                StoreId = cart.StoreId,
-                DeliveryAddress = address,
-                DeliveryFee = fee,
-            };
-            _context.Orders.Add(order.ToOrderEF());
-            _context.SaveChanges();
-
-            var createMark = _context.Orders.First(o => o.MemberId == cart.MemberId && o.StoreId == cart.StoreId && o.CreateMark == true);
-            foreach (var detail in cart.CartDetails.OrderBy(cd => cd.IdentifyNum).ThenBy(cd => cd.ItemId))
-            {
-                var orderDetail = new OrderDetailDTO
+                var cart = _context.Carts.Include(c => c.CartDetails).Where(c => c.MemberId == memberId && c.StoreId == storeId);
+                var targetCart = cart.First();
+                var order = new OrderDTO
                 {
-                    IdentifyNum = detail.IdentifyNum,
-                    ProductId = detail.ProductId,
-                    ProductPrice = _context.Products.First(p => p.Id == detail.ProductId).UnitPrice,
-                    ItemId = detail.ItemId,
-                    ItemPrice = _context.ProductCustomizationItems.First(pci => pci.Id == detail.ItemId).UnitPrice,
-                    Qty = detail.Qty,
-                    OrderId = createMark.Id,
+                    MemberId = targetCart.MemberId,
+                    StoreId = targetCart.StoreId,
+                    DeliveryAddress = _context.AccountAddresses.First(aa => aa.Id == addressId).Address,
+                    DeliveryFee = fee,
+                    Milage = 0,
+                    CreateMark = true,
                 };
-                _context.OrderDetails.Add(orderDetail.ToOrderDetailEF());
+
+                _context.Orders.Add(order.ToOrderEF());
+                _context.SaveChanges();
+
+                var createMark = _context.Orders.First(o => o.MemberId == targetCart.MemberId && o.StoreId == targetCart.StoreId && o.CreateMark == true);
+                foreach (var detail in targetCart.CartDetails.OrderBy(cd => cd.IdentifyNum).ThenBy(cd => cd.ItemId))
+                {
+                    var identifyNum = detail.IdentifyNum;
+                    var productId = detail.ProductId;
+                    var productPrice = _context.Products.First(p => p.Id == detail.ProductId).UnitPrice;
+                    var itemId = detail.ItemId;
+                    var itemPrice = _context.ProductCustomizationItems.Where(pci => pci.Id == detail.ItemId).Select(pci => pci.UnitPrice).FirstOrDefault();
+                    var qty = detail.Qty;
+                    var orderId = createMark.Id;
+                    var orderDetail = new OrderDetailDTO
+                    {
+                        IdentifyNum = identifyNum,
+                        ProductId = productId,
+                        ProductPrice = productPrice,
+                        ItemId = itemId,
+                        ItemPrice = itemPrice,
+                        Qty = qty,
+                        OrderId = orderId,
+                    };
+                    _context.OrderDetails.Add(orderDetail.ToOrderDetailEF());
+                }
+
+                var orderSechedule = new OrderScheduleDTO
+                {
+                    OrderId = createMark.Id,
+                    StatusId = _context.OrderStatues.Select(os => os.Id).Min(),
+                    MarkTime = DateTime.Now,
+                };
+                _context.OrderSchedules.Add(orderSechedule.ToOrderScheduleEF());
+
+                createMark.CreateMark = false;
+                _context.SaveChanges();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
             }
 
-            var orderSechedule = new OrderScheduleDTO
-            {
-                OrderId = createMark.Id,
-                StatusId = _context.OrderStatues.Min().Id,
-                MarkTime = DateTime.Now,
-            };
-            _context.OrderSchedules.Add(orderSechedule.ToOrderScheduleEF());
-
-            createMark.CreateMark = false;
-            _context.SaveChanges();
         }
 
         public OrderDTO GetOrderTrack(long orderId)
         {
-            var order = _context.Orders
-                .AsNoTracking()
-                .Include(o => o.OrderDetails)
-                .FirstOrDefault(o => o.Id == orderId).ToOrderDTO();
-            var identifyGroup = order.Details.GroupBy(d => d.IdentifyNum); ;
-            var orderDetail = identifyGroup.Select(gd => new OrderDetailDTO
+            try
             {
-                IdentifyNum = gd.Key,
-                ProductId = gd.First().ProductId,
-                ProductName = _context.Products.First(p => p.Id == gd.First().ProductId).ProductName,
-                ItemIds = gd.Select(d => d.ItemId).ToList(),
-                ItemName = string.Join(", ", _context.ProductCustomizationItems
-                    .Where(pci => gd.Select(d => d.ItemId).Contains(pci.Id))
-                    .Select(pci => pci.ItemName).ToList()),
-                Qty = gd.First().Qty,
-                SubTotal = (
-                           _context.Products.Single(p => p.Id == gd.First().ProductId).UnitPrice +
-                           _context.ProductCustomizationItems.Where(pci => gd.Select(d => d.ItemId).Contains(pci.Id)).Sum(pci => pci.UnitPrice)
-                           ) * gd.First().Qty,
-                OrderId = order.Id,
-            }).ToList();
-
-            var orderSchedule = _context.OrderSchedules
-                .Where(os => os.OrderId == order.Id)
-                .Select(os => new OrderScheduleDTO
+                var order = _context.Orders                    
+                    .Include(o => o.OrderDetails)
+                    .Include(o => o.OrderSchedules)
+                    .Where(o => o.Id == orderId)
+                    .First();              
+                
+                var orderTrack = new OrderDTO
                 {
-                    StatusId = os.StatusId,
-                    StatusName = os.Status.Status,
-                    MarkTime = os.MarkTime,
-                }).ToList();
+                    Id = order.Id,
+                    MemberId = order.MemberId,
+                    MemberName = _context.Members.Where(m => m.Id == order.MemberId).Select(m => m.FirstName + " " + m.LastName).FirstOrDefault(),
+                    StoreId = order.StoreId,
+                    StoreName = _context.Stores.Where(s => s.Id == order.StoreId).Select(s => s.StoreName).First(),
+                    DetailQty = order.OrderDetails.GroupBy(od => od.IdentifyNum).Sum(gd => gd.First().Qty),
+                    DeliveryFee = order.DeliveryFee,
+                    Total = order.OrderDetails.GroupBy(od => od.IdentifyNum).Sum(gd =>
+                    {
+                        var productId = gd.First().ProductId;
+                        var itemsId = gd.Select(d => d.ItemId).ToList();
+                        var productPrice = _context.Products.First(p => p.Id == productId).UnitPrice;
+                        var itemsPrice = _context.ProductCustomizationItems.Where(pci => itemsId.Contains(pci.Id)).Sum(pci => pci.UnitPrice);
+                        var qty = gd.First().Qty;
 
-            var orderTrack = new OrderDTO
+                        return (productPrice + itemsPrice) * qty + order.DeliveryFee;
+                    }),
+                    
+                    Details = order.OrderDetails.GroupBy(od => od.IdentifyNum).Select(gd =>
+                    {
+                        var productId = gd.First().ProductId;
+                        var itemsId = gd.Select(d => d.ItemId).ToList();
+                        var productPrice = _context.Products.First(p => p.Id == productId).UnitPrice;
+                        var itemsPrice = _context.ProductCustomizationItems.Where(pci => itemsId.Contains(pci.Id)).Sum(pci => pci.UnitPrice);
+                        var qty = gd.First().Qty;
+
+                        return new OrderDetailDTO
+                        {
+                            IdentifyNum = gd.Key,
+                            ProductId = productId,
+                            ProductName = _context.Products.First(p => p.Id == productId).ProductName,
+                            ItemsId = itemsId,
+                            ItemName = string.Join(", ", _context.ProductCustomizationItems
+                            .Where(pci => itemsId.Contains(pci.Id))
+                            .Select(pci => pci.ItemName).ToList()),
+                            Qty = qty,
+                            SubTotal = (productPrice + itemsPrice) * qty,
+
+                        };
+                    }).ToList(),
+
+                    Schedules = order.OrderSchedules.Select(os => new OrderScheduleDTO
+                    {
+                        OrderId = os.OrderId,
+                        StatusId = os.StatusId,
+                        StatusName = _context.OrderStatues.Where(ost => ost.Id == os.StatusId).First().Status,
+                        MarkTime = os.MarkTime,
+                    }).ToList()
+                };                                            
+
+                return orderTrack;
+            }
+            catch (Exception ex)
             {
-                Id = order.Id,
-                MemberId = order.MemberId,
-                MemberName = _context.Members.Where(m => m.Id == order.MemberId).Select(m => m.FirstName + " " + m.LastName).FirstOrDefault(),
-                StoreId = order.StoreId,
-                StoreName = _context.Stores.First(s => s.Id == order.StoreId).StoreName,
-                DetailQty = orderDetail.Where(d => d.OrderId == order.Id).Sum(d => d.Qty),
-                DeliveryFee = order.DeliveryFee,
-                Total = orderDetail.Where(d => d.OrderId == order.Id).Sum(d => d.SubTotal) + order.DeliveryFee,
-                Details = orderDetail,
-                Schedules = orderSchedule,
-            };
+                throw new Exception(ex.Message);
+            }
+        }
 
-            return orderTrack;
+        public int getFee(long cartId, int addressId)
+        {
+            var fee = Convert.ToInt32(_addressClac.GetDeliveryFee(cartId, addressId).Result);
+
+            return fee;
         }
     }
 }

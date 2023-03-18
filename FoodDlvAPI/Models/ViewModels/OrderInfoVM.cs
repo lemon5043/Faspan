@@ -38,6 +38,7 @@ namespace FoodDlvAPI.Models.ViewModels
         [Display(Name = "里程數")]
         public decimal Milage { get; set; }
         public List<OrderDetailDTO> Details { get; set; }
+        public List<OrderScheduleDTO> Schedules { get; set; }
         public CartInfoVM CartVM { get; set; }
 
         /// <summary>
@@ -59,7 +60,9 @@ namespace FoodDlvAPI.Models.ViewModels
                 DeliveryFee = source.DeliveryFee,
             };
             return orderInfoVM;
-        }
+        }                
     }
+
+
 }
 

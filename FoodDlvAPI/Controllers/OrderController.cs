@@ -26,7 +26,7 @@ namespace FoodDlvAPI.Controllers
             IProductRepository productRepo = new ProductRepository(_context);
             
 
-            this._orderService = new OrderService(orderRepo, cartRepo);
+            this._orderService = new OrderService(orderRepo, cartRepo, context);
             this._cartService = new CartService(cartRepo, productRepo);
         }
 
@@ -46,14 +46,13 @@ namespace FoodDlvAPI.Controllers
         }
 
         [HttpPost("OrderEstablished")]
-        public IActionResult OrderEstablished(int memberId, int storeId, int fee ,string address) 
+        public IActionResult OrderEstablished(long cartId, int addressId) 
         {
             try
             {
-
-                _cartService.CheckOutCart(memberId, storeId);
+                _cartService.CheckOutCart(cartId);
                 //_orderService.CheckOutTime(storeId);
-                _orderService.OrderEstablished(memberId, storeId, fee, address);
+                _orderService.OrderEstablished(cartId, addressId);
                 return new EmptyResult();
             }
             catch (Exception ex)

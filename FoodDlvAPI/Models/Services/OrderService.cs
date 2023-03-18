@@ -8,13 +8,14 @@ namespace FoodDlvAPI.Models.Services
         //Fields
         private readonly IOrderRepository _orderRepository;
         private readonly ICartRepository _cartRepository;
-
+        private readonly AppDbContext _context;
 
         //Constructors
-        public OrderService(IOrderRepository orderRepository, ICartRepository cartRepository)
+        public OrderService(IOrderRepository orderRepository, ICartRepository cartRepository, AppDbContext context)
         {
             _orderRepository = orderRepository;
             _cartRepository = cartRepository;
+            _context = context;
         }
 
         public OrderDTO OrderInfo(long cartId, int addressId)
@@ -28,10 +29,13 @@ namespace FoodDlvAPI.Models.Services
             _orderRepository.CheckOutTime(storeId);
         }
 
-        public void OrderEstablished(int memberId, int storeId, int fee, string address)
+        public void OrderEstablished(long cartId, int addressId)
         {
+            var memberId = _context.Carts.Where(c => c.Id == cartId).Select(c => c.MemberId).First();
+            var storeId = _context.Carts.Where(c => c.Id == cartId).Select(c => c.StoreId).First();
+            var fee = _orderRepository.getFee(cartId, addressId);
             _orderRepository.CashTransfer(memberId, storeId, fee);
-            _orderRepository.CreateNewOrder(memberId, storeId, fee, address);
+            _orderRepository.CreateNewOrder(memberId, storeId, fee, addressId);            
             _cartRepository.EmptyCart(memberId, storeId);
         }
 

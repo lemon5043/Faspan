@@ -66,9 +66,9 @@ namespace FoodDlvAPI.Models.Services
             _cartRepository.EmptyCart(memberId, storeId);
         }
 
-        public void CheckOutCart(int memberId, int storeId)
-        {
-            var cart = Current(memberId, storeId);
+        public void CheckOutCart(long cartId)
+        {              
+            var cart = _cartRepository.CheckOutCart(cartId);
             if (cart.Details.Count == 0 || cart.Details == null)
             {
                 throw new Exception("購物車內無商品, 無法進行結帳");

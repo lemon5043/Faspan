@@ -34,7 +34,7 @@ namespace FoodDlvAPI.Interfaces
         /// <param name="storeId"></param>
         /// <param name="fee"></param>
         /// <param name="address"></param>
-        void CreateNewOrder(int memberId, int storeId, int fee, string address);
+        void CreateNewOrder(int memberId, int storeId, int fee, int addressId);
 
         /// <summary>
         /// 顯示訂單資訊與追蹤訂單目前狀態
@@ -42,5 +42,12 @@ namespace FoodDlvAPI.Interfaces
         /// <param name="orderId"></param>
         /// <returns></returns>
         OrderDTO GetOrderTrack(long orderId);
+
+        /// <summary>
+        /// 取得外送費
+        /// </summary>
+        /// <param name="addressId"></param>
+        /// <returns></returns>
+        int getFee(long cartId ,int addressId);
     }
 }

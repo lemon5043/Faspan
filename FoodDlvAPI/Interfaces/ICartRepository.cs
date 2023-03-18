@@ -58,6 +58,11 @@ namespace FoodDlvAPI.Interfaces
         /// <param name="identifyNum"></param>
         void RemoveDetail(int identifyNum);
 
-
+        /// <summary>
+        /// 結帳時確認購物車內容
+        /// </summary>
+        /// <param name="cartId"></param>
+        /// <returns></returns>
+        CartDTO CheckOutCart(long cartId);
     }
 }
