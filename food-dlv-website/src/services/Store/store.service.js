@@ -12,6 +12,28 @@ class StoreService {
     );
   }
 
+  getByCategories(address, categoryId) {
+    if (address === "" || typeof address == "undefined") return;
+
+    return axios.get(
+      API_URL +
+        "getSomeStoresIfIMAt/" +
+        address +
+        "?pageNum=1&storeNum=20&categoryId=" +
+        categoryId
+    );
+  }
+
+  getBySearch(address, search) {
+    return axios.get(
+      API_URL +
+        "getSomeStoresIfIMAt/" +
+        address +
+        "?pageNum=1&storeNum=20&searchString=" +
+        search
+    );
+  }
+
   getCategories() {
     return axios.get(API_URL + "getStoreCategories");
   }

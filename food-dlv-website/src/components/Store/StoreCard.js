@@ -1,7 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 
-const StoreComponent = ({ data }) => {
+const StoreComponent = ({ data, calcFee }) => {
   const image = require(`../../assets/images/public/Stores/${data.photo}`);
   const categories = data.categoryName;
   const distance = Math.round(data.distance) * 5 + 20;
@@ -20,13 +20,25 @@ const StoreComponent = ({ data }) => {
             <p>{distance}分</p>
           </div>
         </figure>
-        <div className="px-6 py-4">
+        <div className="pt-2">
           <div className="font-bold text-xl">{data.storeName}</div>
         </div>
-        <div className="px-6 pt-2 pb-2">
-          <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">
-            #photography
-          </span>
+        <div className=" pt-2 pb-2">
+          <div className="flex justify-between items-center">
+            <ul>
+              {data.categoryName.map((d) => {
+                return (
+                  <li
+                    key={d}
+                    className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2"
+                  >
+                    {d}
+                  </li>
+                );
+              })}
+            </ul>
+            <p className="text-sm">$ {calcFee(data.distance)} fee</p>
+          </div>
         </div>
       </Link>
     </div>

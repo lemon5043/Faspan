@@ -91,15 +91,15 @@ namespace FoodDlvAPI.Controllers
             {
                 feePerKm = 20;
             }
-            else if (distance >= 1 && distance < 5)
+            else if (distance >= 1 && distance < 2)
             {
                 feePerKm = 25;
             }
-            else if (distance >= 5 && distance < 10)
+            else if (distance >= 2 && distance < 4)
             {
                 feePerKm = 30;
             }
-            else if (distance >= 10 && distance < 15)
+            else if (distance >= 4 && distance < 6)
             {
                 feePerKm = 40;
             }
