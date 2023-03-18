@@ -20,6 +20,7 @@ import useOverlay from "../hooks/useOverlay";
 import AddressOverlay from "../pages/User/AddressOverlay";
 import userAddressService from "../services/User/userAddress.service";
 import FmdGoodIcon from "@mui/icons-material/FmdGood";
+import AccessibleForwardIcon from "@mui/icons-material/AccessibleForward";
 
 //mui
 const drawerWidth = 360;
@@ -85,6 +86,9 @@ const Layout = ({
                 FASPAN
               </div>
             </Link>
+            <Link to="/delivery/login">
+              <AccessibleForwardIcon className="mb-1" />
+            </Link>
             {/* 搜尋欄 */}
             <LayoutBtn
               className="ml-16 flex items-center"
@@ -133,17 +137,17 @@ const Layout = ({
                     <DropdownMenu className="w-28 shadow-lg">
                       <ul className="w-full text-center">
                         <DropdownItem>
-                          <Link to="/cart" className="text-base">
+                          <Link to="/user" className="text-base">
                             個人檔案
                           </Link>
                         </DropdownItem>
                         <DropdownItem>
-                          <Link to="/cart" className="text-base">
+                          <Link to="/user" className="text-base">
                             我的訂單
                           </Link>
                         </DropdownItem>
                         <DropdownItem>
-                          <Link to="/cart" className="text-base">
+                          <Link to="/user" className="text-base">
                             客服中心
                           </Link>
                         </DropdownItem>
@@ -159,7 +163,7 @@ const Layout = ({
               )}
             </div>
             {/* 購物車超連結 */}
-            <div className="p-4">
+            <div className="px-4">
               <button>
                 <img
                   src={bag}

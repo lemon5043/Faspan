@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Label, Input, Button, Box } from "../../components/Style/form-styling";
-import driverAuthService from "../../services/User/userAuth.service";
+import UserAuthService from "../../services/User/userAuth.service";
 
 const Register = () => {
   const navigate = useNavigate();
@@ -24,9 +24,11 @@ const Register = () => {
       formData.append("firstName", firstName);
       formData.append("lastName", lastName);
       formData.append("phone", phone);
-      await driverAuthService.register(formData);
-      alert("註冊成功");
-      navigate("/login");
+      await UserAuthService.register(formData).then(() => {
+        UserAuthService.emailConfirmation();
+        alert("註冊成功，已寄 email 到您的信箱，");
+        navigate("/login");
+      });
     } catch (e) {
       console.log("e");
     }

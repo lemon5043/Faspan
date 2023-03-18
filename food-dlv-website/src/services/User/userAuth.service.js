@@ -21,9 +21,31 @@ class UserAuthService {
     return data;
   }
 
+  displayuserId(userId) {
+    const response = axios.get(API_URL + "/" + userId);
+    return response;
+  }
+
   logout() {
     localStorage.removeItem("user");
     localStorage.removeItem("address");
+  }
+
+  emailConfirmation() {
+    return axios.post("https://localhost:7093/api/Email/SendEmail?memberid=17");
+  }
+
+  forgotPassword(account) {
+    return (
+      axios.post("https://localhost:7093/api/Email/ForgetPassword"),
+      {
+        account: account,
+      },
+      {
+        headers: { accept: "text/plain", "Content-Type": "application/json" },
+        responseType: "text",
+      }
+    );
   }
 }
 
