@@ -10,10 +10,9 @@ class OrderService {
     return response;
   }
 
-  postOrderEstablished(memberId, storeId, fee, address) {
+  postOrderEstablished(cartId, addressId) {
     const response = axios.post(
-      API_URL +
-        `OrderEstablished?memberId=${memberId}&storeId=${storeId}&fee=${fee}&address=${address}`
+      API_URL + `OrderEstablished?cartId=${cartId}&addressId=${addressId}`
     );
     return response;
   }

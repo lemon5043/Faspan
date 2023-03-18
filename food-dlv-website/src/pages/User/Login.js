@@ -59,7 +59,10 @@ const Login = ({ setCurrentUser, setCurrentAddress, setCartDetail }) => {
               onChange={(e) => setPassword(e.target.value)}
             />
           </div>
-          <Link to="/" className="text-sm text-neutral-600 hover:underline">
+          <Link
+            to="/forgotPassword"
+            className="text-sm text-neutral-600 hover:underline"
+          >
             忘記密碼?
           </Link>
           <div className="mt-6">

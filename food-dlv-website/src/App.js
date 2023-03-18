@@ -6,6 +6,7 @@ import Layout from "./components/Layout";
 //登入註冊
 import Login from "./pages/User/Login";
 import Register from "./pages/User/Register";
+import ForgotPw from "./pages/User/ForgotPw";
 //頁面
 import User from "./pages/User/User";
 import Error from "./pages/Error";
@@ -46,6 +47,7 @@ function App() {
     <BrowserRouter>
       <Routes>
         {/* 使用者頁面 */}
+        setCartDetail{" "}
         <Route
           path="/"
           element={
@@ -60,7 +62,12 @@ function App() {
           }
         >
           <Route index element={<Home />}></Route>
-          <Route path="user" element={<User />}></Route>
+          <Route
+            path="user"
+            element={
+              <User currentUser={currentUser} setCurrentUser={setCurrentUser} />
+            }
+          ></Route>
           <Route
             path="login"
             element={
@@ -82,12 +89,17 @@ function App() {
               />
             }
           ></Route>
+          <Route path="/forgotPassword" element={<ForgotPw />}></Route>
           <Route path="*" element={<Error />}></Route>
         </Route>
         <Route
           path="checkout"
           element={
-            <Checkout currentAddress={currentAddress} cartDetail={cartDetail} />
+            <Checkout
+              currentAddress={currentAddress}
+              cartDetail={cartDetail}
+              setCartDetail={setCartDetail}
+            />
           }
         ></Route>
         {/* 外送員頁面 */}

@@ -115,19 +115,16 @@ const Cart = ({ currentUser, currentAddress, setCartDetail, cartDetail }) => {
         </div>
       )}
       {/* 購物車沒東西時顯示的畫面 */}
-      {currentUser &&
-        currentAddress &&
-        cartDetail &&
-        cartDetail.length === 0 && (
-          <div className="flex justify-center items-center h-screen flex-col">
-            <img src={ShoppingCart} alt="shoppingCart.png" className="w-2/3" />
-            <h2 className="text-xl font-bold my-2">購物車是空的!</h2>
-            <p className="mb-4">來把錢錢變成喜歡的東西吧~</p>
-            <LayoutBtn>
-              <Link to={"/store/" + currentAddress.address}>開逛</Link>
-            </LayoutBtn>
-          </div>
-        )}
+      {currentUser && currentAddress && !cartDetail && (
+        <div className="flex justify-center items-center h-screen flex-col">
+          <img src={ShoppingCart} alt="shoppingCart.png" className="w-2/3" />
+          <h2 className="text-xl font-bold my-2">購物車是空的!</h2>
+          <p className="mb-4">來把錢錢變成喜歡的東西吧~</p>
+          <LayoutBtn>
+            <Link to={"/store/" + currentAddress.address}>開逛</Link>
+          </LayoutBtn>
+        </div>
+      )}
     </div>
   );
 };

@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { Label, Input, Button, Box } from "../components/Style/form-styling";
 import Logo from "../assets/images/logo.svg";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import OrderService from "../services/order.service.js";
 
-const Checkout = ({ currentAddress, cartDetail }) => {
+const Checkout = ({ currentAddress, cartDetail, setCartDetail }) => {
   const [orderInfo, setOrderInfo] = useState(null);
+  const navigate = useNavigate();
 
   const getOrderInfo = async () => {
     const res = await OrderService.getOrderInfo(
@@ -15,6 +16,20 @@ const Checkout = ({ currentAddress, cartDetail }) => {
     console.log(res.data);
     setOrderInfo(res.data);
     return res;
+  };
+
+  const establishOrder = async () => {
+    await OrderService.postOrderEstablished(
+      cartDetail.cartDetails[0].cartId,
+      currentAddress.id
+    )
+      .then(() => {
+        alert("訂單已送出!");
+        setCartDetail(null);
+        localStorage.removeItem("cartInfo");
+        navigate("/");
+      })
+      .catch((error) => console.log(error));
   };
 
   useEffect(() => {
@@ -77,7 +92,9 @@ const Checkout = ({ currentAddress, cartDetail }) => {
               <p>外送費</p>
               <p>$ {orderInfo.deliveryFee}</p>
             </div>
-            <Button className="mt-4">一鍵下訂單</Button>
+            <Button onClick={establishOrder} className="mt-4">
+              一鍵下訂單
+            </Button>
           </Box>
         </div>
       )}

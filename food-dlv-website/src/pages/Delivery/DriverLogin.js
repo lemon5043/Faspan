@@ -20,6 +20,7 @@ const DriverLogin = ({ currentDriver, setCurrentDriver }) => {
       localStorage.setItem("driver", res.data);
 
       const data = await driverAuthService.GetDriver(res.data);
+      navigate("/delivery");
       console.log(data.data);
 
       // setCurrentDriver(driverAuthService.getCurrentDriver());
