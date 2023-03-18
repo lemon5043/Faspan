@@ -10,6 +10,7 @@ import Table from "../../assets/images/table.jpg";
 import Honmono from "../../assets/images/honmono.jpg";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
+import { HubConnectionBuilder, LogLevel } from "@microsoft/signalr"; //signalr使用
 
 const Home = () => {
   // slick 設定
@@ -129,6 +130,8 @@ const Home = () => {
     },
   ];
 
+  
+
   return (
     <div className="bg-theme-color" style={{ height: "94vh" }}>
       <div className="pt-4 h-3/5">
@@ -141,7 +144,7 @@ const Home = () => {
       <div className="h-2/5">
         <div className="flex h-full relative bg-theme-color items-end">
           <div className="slogan absolute bottom-1/4 left-24">
-            <h1 className=" text-4xl">想點什麼呢?</h1>
+            <h1 className=" text-4xl" >想點什麼呢?</h1>            
             <h5>
               以上的推薦您滿意嗎?
               <br />
