@@ -38,7 +38,7 @@ namespace FoodDlvProject2.Controllers
 			}
 
 			var store = await _context.Stores
-				.Include(s => s.StorePrincipal).Include(x => x.StoreBusinessHours).Include(x => x.Products).Include(x => x.StoreCancellationRecords).Include(x => x.StoreWallet).Include(x => x.StoreViolationRecord)
+				.Include(s => s.StorePrincipal).Include(x => x.StoreBusinessHours).Include(x => x.Products).Include(x=>x.StoresCategoriesLists).ThenInclude(x=>x.Category)
 				.FirstOrDefaultAsync(m => m.Id == id);
 			if (store == null)
 			{
