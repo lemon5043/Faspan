@@ -22,7 +22,7 @@ const DriverMap = () => {
     //googleMapsApiKey: "",
   });
   let [orderId, setOrderId] = useState(0);
-  let [driverId, setDriverId] = useState();
+  let [driverId, setDriverId] = useState(0);
   let [memberId, setMemberId] = useState(0);
   let [storeName, setStoreName] = useState("");
   let [storeAddress, setStoreAddress] = useState("");
@@ -148,7 +148,7 @@ const DriverMap = () => {
   //向餐廳導航
   async function NavationToStore(orderId, driverId) {
     try {
-      const orderDetail = await delieveryService.OrderAccept(orderId, driverId);
+      const orderDetail = await delieveryService.OrderAccept(parseInt(orderId), parseInt(driverId));
       setStoreName(orderDetail.StoreName);
       setMemberId(orderDetail.MemberId);
       calculateRoute(orderDetail.StoreAddress);
@@ -162,9 +162,7 @@ const DriverMap = () => {
   async function NavationToCustomer(orderId) {
     try {
       clearRoute();
-      const customerAddress = await delieveryService.NavationToCustomer(
-        orderId
-      );
+      const customerAddress = await delieveryService.NavationToCustomer(parseInt(orderId));
       setCustomerAddress(customerAddress);
       calculateRoute(customerAddress);
     } catch (e) {
@@ -178,7 +176,7 @@ const DriverMap = () => {
       clearRoute();
       const memberIdToInt = parseInt(memberId)
       const driver = (await driverAuthService.GetDriver(token)).data;
-      await delieveryService.DeliveryArrive(orderId, driver.driverId, distance);
+      await delieveryService.DeliveryArrive(orderId, parseInt(driver.driverId), distance);
       const targetRole = "Member";
       const connection = new HubConnectionBuilder()
         .withUrl("https://localhost:7093/OrderHub")
