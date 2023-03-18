@@ -8,9 +8,14 @@ import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
-import useCart from "../../hooks/useCart";
+import { CartContext } from "../../pages/Cart/Cart";
 
-const ProductSelection = ({ productId, currentUser, onClose }) => {
+const ProductSelection = ({
+  productId,
+  currentUser,
+  onClose,
+  setCartDetail,
+}) => {
   const [product, setProduct] = useState(null);
   const [selectItems, setSelectItems] = useState([]);
   const [qty, setQty] = useState(1);
@@ -76,12 +81,16 @@ const ProductSelection = ({ productId, currentUser, onClose }) => {
         selectItems,
         qty
       );
+      CartService.getCartInfo(currentUser.userId);
       Swal.fire({
         title: "已加入購物車!",
         icon: "success",
         timer: 2000,
         showConfirmButton: false,
-      }).then(() => onClose());
+      }).then(() => {
+        setCartDetail(CartService.getCurrentCart());
+        onClose();
+      });
     } catch (error) {
       console.log(error);
     }

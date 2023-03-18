@@ -9,6 +9,7 @@ const ProductOverlay = ({
   currentUser,
   data,
   id,
+  setCartDetail,
 }) => {
   return (
     <Fragment>
@@ -22,6 +23,7 @@ const ProductOverlay = ({
                   productId={id}
                   currentUser={currentUser}
                   onClose={onClose}
+                  setCartDetail={setCartDetail}
                 />
               </div>
             </OverlayMain>

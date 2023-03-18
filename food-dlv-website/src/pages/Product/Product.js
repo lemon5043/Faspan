@@ -4,7 +4,7 @@ import StoreService from "../../services/Store/store.service";
 import ProductPage from "./ProductPage";
 import UserAuthService from "../../services/User/userAuth.service";
 
-const Product = ({ currentUser }) => {
+const Product = ({ currentUser, setCartDetail }) => {
   const params = useParams();
   const storeId = params.storeId;
   let [data, setData] = useState([]);
@@ -22,7 +22,11 @@ const Product = ({ currentUser }) => {
     <div className="flex">
       {data.length !== 0 && (
         <section className="w-full">
-          <ProductPage data={data} currentUser={currentUser} />
+          <ProductPage
+            data={data}
+            currentUser={currentUser}
+            setCartDetail={setCartDetail}
+          />
         </section>
       )}
     </div>

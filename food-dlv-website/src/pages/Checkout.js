@@ -1,29 +1,26 @@
 import React, { useEffect, useState } from "react";
-import useCart from "../hooks/useCart";
 import { Label, Input, Button, Box } from "../components/Style/form-styling";
 import Logo from "../assets/images/logo.svg";
-import { Link, useParams } from "react-router-dom";
+import { Link } from "react-router-dom";
 import OrderService from "../services/order.service.js";
 
-const Checkout = ({ currentUser, currentAddress, currentAddressId }) => {
-  const { cartDetail, CartInfo } = useCart();
+const Checkout = ({ currentAddress, cartDetail }) => {
   const [orderInfo, setOrderInfo] = useState(null);
-  const params = useParams();
-  const cartId = params.cartId;
 
   const getOrderInfo = async () => {
-    const res = await OrderService.getOrderInfo(cartId, currentAddressId);
+    const res = await OrderService.getOrderInfo(
+      cartDetail.cartDetails[0].cartId,
+      currentAddress.id
+    );
     console.log(res.data);
     setOrderInfo(res.data);
     return res;
   };
 
   useEffect(() => {
-    if (currentUser) {
-      CartInfo(0, currentUser.userId);
-      getOrderInfo();
-    }
+    getOrderInfo();
   }, []);
+
   return (
     <div>
       <nav
@@ -46,7 +43,7 @@ const Checkout = ({ currentUser, currentAddress, currentAddressId }) => {
           </li>
         </ul>
       </nav>
-      {cartDetail.length !== 0 && orderInfo && (
+      {orderInfo && (
         <div className="h-screen flex justify-center items-center">
           <Box>
             <h2 className="text-3xl font-semibold mb-6">
@@ -55,7 +52,7 @@ const Checkout = ({ currentUser, currentAddress, currentAddressId }) => {
             <h3 className="text-xl font-semibold mb-2">外送詳細資訊</h3>
             <p className="mb-2">
               <span className="font-semibold ">外送地址:</span>
-              {currentAddress}
+              {currentAddress.address}
             </p>
             <h4 className="text-lg font-semibold mb-2">訂單摘要</h4>
             <div>
@@ -72,13 +69,13 @@ const Checkout = ({ currentUser, currentAddress, currentAddressId }) => {
                 );
               })}
             </div>
-            <div className="flex justify-between">
+            <div className="flex justify-between mb-2">
               <p>小計</p>
-              <p>{cartDetail.total}</p>
+              <p>$ {cartDetail.total}</p>
             </div>
             <div className="flex justify-between">
               <p>外送費</p>
-              <p>{orderInfo.deliveryFee}</p>
+              <p>$ {orderInfo.deliveryFee}</p>
             </div>
             <Button className="mt-4">一鍵下訂單</Button>
           </Box>

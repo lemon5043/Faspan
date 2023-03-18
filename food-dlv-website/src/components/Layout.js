@@ -29,6 +29,8 @@ const Layout = ({
   setCurrentUser,
   currentAddress,
   setCurrentAddress,
+  cartDetail,
+  setCartDetail,
 }) => {
   const navigate = useNavigate();
   const { isOpen, toggleOverlay, bubblePreventer } = useOverlay();
@@ -49,6 +51,7 @@ const Layout = ({
         userAuthService.logout();
         setCurrentUser(null);
         setCurrentAddress(null);
+        setCartDetail(null);
         navigate("/");
       }
     });
@@ -189,7 +192,12 @@ const Layout = ({
             </button>
           </div>
           {/* <Divider /> */}
-          <Cart currentUser={currentUser} />
+          <Cart
+            currentUser={currentUser}
+            currentAddress={currentAddress}
+            setCartDetail={setCartDetail}
+            cartDetail={cartDetail}
+          />
         </Drawer>
         <Outlet />
       </div>

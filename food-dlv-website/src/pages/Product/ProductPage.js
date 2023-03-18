@@ -5,7 +5,7 @@ import StoreInfo from "../../components/Product/StoreInfo";
 import ProductOverlay from "../../components/ProductSelection/ProductOverlay";
 import useOverlay from "../../hooks/useOverlay";
 
-const ProductPage = ({ data, currentUser }) => {
+const ProductPage = ({ data, currentUser, setCartDetail }) => {
   const { isOpen, setIsOpen, bubblePreventer } = useOverlay();
   const [id, setId] = useState(0);
 
@@ -29,6 +29,7 @@ const ProductPage = ({ data, currentUser }) => {
         bubblePreventer={bubblePreventer}
         data={data}
         id={id}
+        setCartDetail={setCartDetail}
       />
       <ul className="flex flex-wrap justify-center">
         {data.products.length !== 0 &&

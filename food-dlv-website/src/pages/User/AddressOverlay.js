@@ -25,44 +25,43 @@ const AddressOverlay = ({
     }
   };
 
-  const searchHandler = async () => {
+  const searchHandler = async (e, address, id) => {
     if (!currentUser) {
       navigate("/login");
       toggleOverlay();
       return;
     }
-    navigate("/store/" + "");
+    localStorage.setItem(
+      "address",
+      JSON.stringify({ address: address, id: id })
+    );
+    setCurrentAddress(UserAddressService.getCurrentAddress());
+    navigate("/store/" + address);
     toggleOverlay();
   };
 
   const chooseAddress = useCallback(async () => {
     if (!currentUser) {
+      setAddress([]);
       return;
     }
     const response = await UserAddressService.getAddress(currentUser.userId);
     setAddress(response.data);
   });
 
-  const CreateNewAddress = useCallback(async () => {
+  const CreateNewAddress = async () => {
     try {
       await UserAddressService.createAddress(currentUser.userId, input);
+      chooseAddress();
     } catch (e) {
       setErrorMessage("請輸入正確的地址");
       console.log(e);
     }
-  });
+  };
 
-  // useEffect(() => {
-  //   chooseAddress();
-  // }, [CreateNewAddress]);
-
-  // useEffect(() => {
-  //   chooseAddress();
-  // }, [address]);
-
-  // useEffect(() => {
-  //   chooseAddress();
-  // }, [currentUser]);
+  useEffect(() => {
+    chooseAddress();
+  }, [currentUser]);
 
   return (
     <Fragment>
@@ -81,7 +80,7 @@ const AddressOverlay = ({
                       type="address"
                       name="address"
                       placeholder="要送到哪呢?"
-                      onChange={setInput}
+                      onChange={(e) => setInput(e.target.value)}
                     />
                     <button className="absolute right-0 top-0 mr-3">
                       <img
@@ -100,7 +99,7 @@ const AddressOverlay = ({
                       return (
                         <WhiteBtn
                           key={d.id}
-                          onClick={searchHandler}
+                          onClick={(e) => searchHandler(e, d.address, d.id)}
                           className="w-full flex my-1 py-2"
                         >
                           <FmdGoodIcon className="mr-2" />

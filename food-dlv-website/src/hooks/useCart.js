@@ -1,7 +1,9 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import CartService from "../services/Cart/cart.service";
 
-const useCart = () => {
+const CartContext = React.createContext();
+
+const useCart = ({ children }) => {
   let [cartDetail, setCartDetail] = useState([]);
 
   //展示購物車內容

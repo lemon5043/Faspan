@@ -31,14 +31,16 @@ import "./assets/styles/tailwind.css";
 import UserAuthService from "./services/User/userAuth.service";
 import Test from "./pages/___test___/Sidebar.test";
 import UserAddressService from "./services/User/userAddress.service";
+import cartService from "./services/Cart/cart.service";
 
 function App() {
-  let [currentUser, setCurrentUser] = useState(
+  const [currentUser, setCurrentUser] = useState(
     UserAuthService.getCurrentUser()
   );
   const [currentAddress, setCurrentAddress] = useState(
     UserAddressService.getCurrentAddress()
   );
+  let [cartDetail, setCartDetail] = useState(cartService.getCurrentCart());
 
   return (
     <BrowserRouter>
@@ -52,6 +54,8 @@ function App() {
               setCurrentUser={setCurrentUser}
               currentAddress={currentAddress}
               setCurrentAddress={setCurrentAddress}
+              cartDetail={cartDetail}
+              setCartDetail={setCartDetail}
             />
           }
         >
@@ -63,6 +67,7 @@ function App() {
               <Login
                 setCurrentUser={setCurrentUser}
                 setCurrentAddress={setCurrentAddress}
+                setCartDetail={setCartDetail}
               />
             }
           ></Route>
@@ -70,17 +75,19 @@ function App() {
           <Route path="store/:addressName" element={<Store />}></Route>
           <Route
             path="product/:storeId"
-            element={<Product currentUser={currentUser} />}
+            element={
+              <Product
+                currentUser={currentUser}
+                setCartDetail={setCartDetail}
+              />
+            }
           ></Route>
           <Route path="*" element={<Error />}></Route>
         </Route>
         <Route
-          path="checkout/:cartId"
+          path="checkout"
           element={
-            <Checkout
-              currentUser={currentUser}
-              currentAddress={currentAddress}
-            />
+            <Checkout currentAddress={currentAddress} cartDetail={cartDetail} />
           }
         ></Route>
         {/* 外送員頁面 */}

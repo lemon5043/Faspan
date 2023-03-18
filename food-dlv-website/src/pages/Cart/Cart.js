@@ -1,40 +1,12 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 
 import CartService from "../../services/Cart/cart.service";
 import ShoppingCart from "../../assets/images/shopping_cart.png";
 import { LayoutBtn, Btn } from "../../components/Style/button-styling";
 import { Link, useNavigate } from "react-router-dom";
-import useCart from "../../hooks/useCart";
 
-const Cart = ({ currentUser, storeId }) => {
-  const { cartDetail, setCartDetail, CartInfo } = useCart();
-  const [identifyNum, setIdentifyNum] = useState("");
+const Cart = ({ currentUser, currentAddress, setCartDetail, cartDetail }) => {
   const navigate = useNavigate();
-
-  //展示購物車內容
-
-  //條件:剛開啟網頁時改變購物車的內容
-  // useEffect(() => {
-  //   if (currentUser) {
-  //     CartInfo(0, currentUser.userId);
-  //   }
-  // }, []);
-
-  // //條件:在cartDetail改變時, 重新獲取購物車的產品明細
-  // useEffect(() => {
-  //   if (currentUser) {
-  //     CartInfo(0, currentUser.userId);
-  //   }
-  // }, [cartDetail]);
-
-  // //條件:切換使用者時, 重新獲取購物車的產品明細
-  // useEffect(() => {
-  //   if (currentUser) {
-  //     CartInfo(0, currentUser.userId);
-  //   } else {
-  //     setCartDetail([]);
-  //   }
-  // }, [currentUser]);
 
   //修改購物車'被選取'商品明細
   function UpdateDetail(detail) {
@@ -66,6 +38,7 @@ const Cart = ({ currentUser, storeId }) => {
     CartService.postRemoveDetail(identifyNum)
       .then(function (response) {
         console.log(response.data);
+        setCartDetail(CartService.getCurrentCart());
       })
       .catch(function (error) {
         console.log(error);
@@ -86,7 +59,7 @@ const Cart = ({ currentUser, storeId }) => {
 
   const checkoutHandler = () => {
     if (cartDetail.length === 0) return;
-    navigate("/checkout/" + cartDetail.cartDetails[0].cartId);
+    navigate("/checkout");
   };
 
   return (
@@ -142,17 +115,19 @@ const Cart = ({ currentUser, storeId }) => {
         </div>
       )}
       {/* 購物車沒東西時顯示的畫面 */}
-      {!cartDetail ||
-        (cartDetail.length === 0 && (
+      {currentUser &&
+        currentAddress &&
+        cartDetail &&
+        cartDetail.length === 0 && (
           <div className="flex justify-center items-center h-screen flex-col">
             <img src={ShoppingCart} alt="shoppingCart.png" className="w-2/3" />
             <h2 className="text-xl font-bold my-2">購物車是空的!</h2>
             <p className="mb-4">來把錢錢變成喜歡的東西吧~</p>
             <LayoutBtn>
-              <Link to="/store">開逛</Link>
+              <Link to={"/store/" + currentAddress.address}>開逛</Link>
             </LayoutBtn>
           </div>
-        ))}
+        )}
     </div>
   );
 };

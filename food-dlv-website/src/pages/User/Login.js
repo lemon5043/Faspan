@@ -1,10 +1,11 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Label, Input, Button, Box } from "../../components/Style/form-styling";
+import cartService from "../../services/Cart/cart.service";
 import userAddressService from "../../services/User/userAddress.service";
 import userAuthService from "../../services/User/userAuth.service";
 
-const Login = ({ setCurrentUser, setCurrentAddress }) => {
+const Login = ({ setCurrentUser, setCurrentAddress, setCartDetail }) => {
   // navigate 是控制重新導向的東西
   const navigate = useNavigate();
   //states
@@ -21,6 +22,7 @@ const Login = ({ setCurrentUser, setCurrentAddress }) => {
         await userAddressService.displayAddress(res.data.userId);
         setCurrentAddress(userAddressService.getCurrentAddress());
         setCurrentUser(userAuthService.getCurrentUser());
+        setCartDetail(cartService.getCurrentCart());
       });
       navigate("/");
     } catch (e) {

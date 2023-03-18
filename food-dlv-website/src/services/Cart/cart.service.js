@@ -14,9 +14,17 @@ class CartService {
     return response;
   }
 
-  getCartInfo(memberId) {
-    const response = axios.get(API_URL + `/CartInfo?memberId=${memberId}`);
+  async getCartInfo(memberId) {
+    const response = await axios.get(
+      API_URL + `/CartInfo?memberId=${memberId}`
+    );
+    localStorage.setItem("cartInfo", JSON.stringify(response.data[0]));
     return response;
+  }
+
+  getCurrentCart() {
+    const data = JSON.parse(localStorage.getItem("cartInfo"));
+    return data;
   }
 
   postUpdateCart(identifyNum, storeId, productId, itemId, qty) {
