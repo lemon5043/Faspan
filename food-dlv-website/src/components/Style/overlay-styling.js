@@ -20,6 +20,5 @@ export const OverlayMain = styled.div`
   margin: auto;
   z-index: 30;
   height: fit-content;
-  width: 37.5rem;
   border-radius: 0.5rem;
 `;

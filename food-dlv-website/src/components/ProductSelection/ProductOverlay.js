@@ -15,7 +15,7 @@ const ProductOverlay = ({
       {isOpen && (
         <div>
           <OverlayBg onClick={onClose}>
-            <OverlayMain onClick={bubblePreventer}>
+            <OverlayMain style={{ width: "37.5rem" }} onClick={bubblePreventer}>
               <div className="flex items-center">
                 <ProductSelection
                   data={data}

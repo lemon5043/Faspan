@@ -14,27 +14,27 @@ const Cart = ({ currentUser, storeId }) => {
   //展示購物車內容
 
   //條件:剛開啟網頁時改變購物車的內容
-  useEffect(() => {
-    if (currentUser) {
-      CartInfo(0, currentUser.userId);
-    }
-  }, []);
+  // useEffect(() => {
+  //   if (currentUser) {
+  //     CartInfo(0, currentUser.userId);
+  //   }
+  // }, []);
 
-  //條件:在cartDetail改變時, 重新獲取購物車的產品明細
-  useEffect(() => {
-    if (currentUser) {
-      CartInfo(0, currentUser.userId);
-    }
-  }, [cartDetail]);
+  // //條件:在cartDetail改變時, 重新獲取購物車的產品明細
+  // useEffect(() => {
+  //   if (currentUser) {
+  //     CartInfo(0, currentUser.userId);
+  //   }
+  // }, [cartDetail]);
 
-  //條件:切換使用者時, 重新獲取購物車的產品明細
-  useEffect(() => {
-    if (currentUser) {
-      CartInfo(0, currentUser.userId);
-    } else {
-      setCartDetail([]);
-    }
-  }, [currentUser]);
+  // //條件:切換使用者時, 重新獲取購物車的產品明細
+  // useEffect(() => {
+  //   if (currentUser) {
+  //     CartInfo(0, currentUser.userId);
+  //   } else {
+  //     setCartDetail([]);
+  //   }
+  // }, [currentUser]);
 
   //修改購物車'被選取'商品明細
   function UpdateDetail(detail) {

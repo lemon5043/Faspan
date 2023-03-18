@@ -44,7 +44,7 @@ namespace FoodDlvAPI.Controllers
 		/// <returns>List<StoreGetDTO>getSomeStoresOrderByDistance</returns>
 
 
-		[HttpGet("getSomeStoresIfIMAt/")]
+		[HttpGet("getSomeStoresIfIMAt/{origin}")]
 		public async Task<ActionResult<IEnumerable<StoreGetDTO>>> GetSomeThisCategoryOfStoresIfIMAt(int pageNum, int storeNum, string? origin, int? categoryId, string? searchString)
 		{
 			if (origin == null)

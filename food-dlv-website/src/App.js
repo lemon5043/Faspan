@@ -36,8 +36,7 @@ function App() {
   let [currentUser, setCurrentUser] = useState(
     UserAuthService.getCurrentUser()
   );
-  const [currentAddress, setCurrentAddress] = useState("");
-  const [currentAddressId, setCurrentAddressId] = useState(
+  const [currentAddress, setCurrentAddress] = useState(
     UserAddressService.getCurrentAddress()
   );
 
@@ -53,8 +52,6 @@ function App() {
               setCurrentUser={setCurrentUser}
               currentAddress={currentAddress}
               setCurrentAddress={setCurrentAddress}
-              currentAddressId={currentAddressId}
-              setCurrentAddressId={setCurrentAddressId}
             />
           }
         >
@@ -62,7 +59,12 @@ function App() {
           <Route path="user" element={<User />}></Route>
           <Route
             path="login"
-            element={<Login setCurrentUser={setCurrentUser} />}
+            element={
+              <Login
+                setCurrentUser={setCurrentUser}
+                setCurrentAddress={setCurrentAddress}
+              />
+            }
           ></Route>
           <Route path="register" element={<Register />}></Route>
           <Route path="store/:addressName" element={<Store />}></Route>
@@ -78,7 +80,6 @@ function App() {
             <Checkout
               currentUser={currentUser}
               currentAddress={currentAddress}
-              currentAddressId={currentAddressId}
             />
           }
         ></Route>

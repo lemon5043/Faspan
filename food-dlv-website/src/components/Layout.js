@@ -19,6 +19,7 @@ import Cart from "../pages/Cart/Cart";
 import useOverlay from "../hooks/useOverlay";
 import AddressOverlay from "../pages/User/AddressOverlay";
 import userAddressService from "../services/User/userAddress.service";
+import FmdGoodIcon from "@mui/icons-material/FmdGood";
 
 //mui
 const drawerWidth = 360;
@@ -28,11 +29,9 @@ const Layout = ({
   setCurrentUser,
   currentAddress,
   setCurrentAddress,
-  currentAddressId,
-  setCurrentAddressId,
 }) => {
   const navigate = useNavigate();
-  const { isOpen, setIsOpen, toggleOverlay, bubblePreventer } = useOverlay();
+  const { isOpen, toggleOverlay, bubblePreventer } = useOverlay();
 
   const logoutHandler = () => {
     Swal.fire({
@@ -49,23 +48,12 @@ const Layout = ({
       if (result.isConfirmed) {
         userAuthService.logout();
         setCurrentUser(null);
+        setCurrentAddress(null);
         navigate("/");
       }
     });
   };
-
-  const enterHandler = (e) => {
-    if (e.key === "Enter") {
-      searchHandler();
-    }
-  };
-
-  const searchHandler = () => {
-    if (currentAddress === "") return;
-    navigate("/store/" + currentAddress);
-    toggleOverlay();
-  };
-  const [open, setOpen] = React.useState(false);
+  const [open, setOpen] = useState(false);
 
   const handleDrawerOpen = () => {
     if (currentUser) setOpen(true);
@@ -74,16 +62,6 @@ const Layout = ({
   const handleDrawerClose = () => {
     setOpen(false);
   };
-
-  const DisplayAddress = async () => {
-    const response = await userAddressService.getAddress(currentUser.userId);
-    setCurrentAddress(response.data[0].address);
-    setCurrentAddressId(response.data[0].id);
-    localStorage.setItem("addressId", JSON.stringify(response.data[0].id));
-  };
-  useEffect(() => {
-    DisplayAddress();
-  }, []);
 
   return (
     <div>
@@ -105,18 +83,23 @@ const Layout = ({
               </div>
             </Link>
             {/* 搜尋欄 */}
-            <LayoutBtn className="ml-16" onClick={toggleOverlay}>
-              {currentAddress}
+            <LayoutBtn
+              className="ml-16 flex items-center"
+              onClick={toggleOverlay}
+            >
+              <FmdGoodIcon className="mr-2" />
+              {!currentAddress && <p>要送到哪呢?</p>}
+              {currentAddress && <p>{currentAddress.address}</p>}
             </LayoutBtn>
             <AddressOverlay
               isOpen={isOpen}
               toggleOverlay={toggleOverlay}
               bubblePreventer={bubblePreventer}
               currentUser={currentUser}
+              currentAddress={currentAddress}
               setCurrentAddress={setCurrentAddress}
-              enterHandler={enterHandler}
-              searchHandler={searchHandler}
               magnifyingGlass={magnifyingGlass}
+              FmdGoodIcon={FmdGoodIcon}
             />
           </li>
 

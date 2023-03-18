@@ -1,9 +1,10 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Label, Input, Button, Box } from "../../components/Style/form-styling";
+import userAddressService from "../../services/User/userAddress.service";
 import userAuthService from "../../services/User/userAuth.service";
 
-const Login = ({ setCurrentUser }) => {
+const Login = ({ setCurrentUser, setCurrentAddress }) => {
   // navigate 是控制重新導向的東西
   const navigate = useNavigate();
   //states
@@ -15,14 +16,17 @@ const Login = ({ setCurrentUser }) => {
   const loginHandler = async (e) => {
     try {
       e.preventDefault();
-      const res = await userAuthService.login(account, password);
-      localStorage.setItem("user", JSON.stringify(res.data));
-      setCurrentUser(userAuthService.getCurrentUser());
+      await userAuthService.login(account, password).then(async (res) => {
+        localStorage.setItem("user", JSON.stringify(res.data));
+        await userAddressService.displayAddress(res.data.userId);
+        setCurrentAddress(userAddressService.getCurrentAddress());
+        setCurrentUser(userAuthService.getCurrentUser());
+      });
       navigate("/");
     } catch (e) {
-      // if (e.response.status === 400) {
-      //   setErrorMessage("帳號或密碼錯誤!");
-      // }
+      if (e.response.status === 400) {
+        setErrorMessage("帳號或密碼錯誤!");
+      }
       console.log(e);
     }
   };
