@@ -84,87 +84,145 @@ namespace FoodDlvAPI.Controllers
 		}
 
 		// GET: api/StorePrincipals
-		[HttpGet]
-        public async Task<ActionResult<IEnumerable<StorePrincipal>>> GetStorePrincipals()
+		//[HttpGet]
+  //      public async Task<ActionResult<IEnumerable<StorePrincipal>>> GetStorePrincipals()
+  //      {
+  //          return await _context.StorePrincipals.ToListAsync();
+  //      }
+
+  //      // GET: api/StorePrincipals/5
+  //      [HttpGet("{id}")]
+  //      public async Task<ActionResult<StorePrincipal>> GetStorePrincipal(int id)
+  //      {
+  //          var storePrincipal = await _context.StorePrincipals.FindAsync(id);
+
+  //          if (storePrincipal == null)
+  //          {
+  //              return NotFound();
+  //          }
+
+  //          return storePrincipal;
+  //      }
+
+
+		[HttpGet("GetStorePrincipalEditVM{id}")]
+		public async Task<ActionResult<StorePrincipalEditVM>> GetStorePrincipalEditVM(int id)
+		{
+			StorePrincipalEditVM storePrincipalEditVM=new StorePrincipalEditVM();
+			try
+			{
+				
+				var storePrincipal = await _context.StorePrincipals.FirstOrDefaultAsync(x => x.Id == id);
+
+				storePrincipalEditVM.FirstName = storePrincipal.FirstName;
+				storePrincipalEditVM.LastName = storePrincipal.LastName;
+				storePrincipalEditVM.Phone = storePrincipal.Phone;
+				storePrincipalEditVM.Gender = storePrincipal.Gender;
+				storePrincipalEditVM.Birthday = storePrincipal.Birthday;
+				storePrincipalEditVM.Email = storePrincipal.Email;
+				storePrincipalEditVM.Password = storePrincipal.Password;
+
+				_context.StorePrincipals.Update(storePrincipal);
+				await _context.SaveChangesAsync();
+			}
+			catch (Exception ex)
+			{
+				throw new Exception(ex.Message);
+			}
+
+			return storePrincipalEditVM;
+		}
+
+
+
+
+
+
+
+
+		// PUT: api/StorePrincipals/5
+		// To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+		[HttpPut("storePrincipalEditVM{id}")]
+		public async Task<string> PutStorePrincipal(int id, StorePrincipalEditVM storePrincipalEditVM)
+		{
+			try {
+
+				var storePrincipal = await _context.StorePrincipals.FirstOrDefaultAsync(x => x.Id == id);
+				
+				storePrincipal.FirstName = storePrincipalEditVM.FirstName;
+				storePrincipal.LastName = storePrincipalEditVM.LastName;
+				storePrincipal.Phone = storePrincipalEditVM.Phone;
+				storePrincipal.Gender = storePrincipalEditVM.Gender;
+				storePrincipal.Birthday = storePrincipalEditVM.Birthday;
+				storePrincipal.Email = storePrincipalEditVM.Email;
+				storePrincipal.Password = storePrincipalEditVM.Password;
+
+				_context.StorePrincipals.Update(storePrincipal);
+				await _context.SaveChangesAsync();
+			} 
+			catch (Exception ex)
+			{ 
+				throw new Exception(ex.Message);
+			}
+
+			return "修改成功";
+
+		}
+
+		// POST: api/StorePrincipals
+		// To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+		[HttpPost]
+        public async Task<string> PostStorePrincipal(StorePrincipalCreateVM storePrincipalCreateVM)
         {
-            return await _context.StorePrincipals.ToListAsync();
-        }
+			try 
+			{
+				var storePrincipal = new StorePrincipal
+				{
+					AccountStatusId = 1,
+					FirstName = storePrincipalCreateVM.FirstName,
+					LastName = storePrincipalCreateVM.LastName,
+					Phone = storePrincipalCreateVM.Phone,
+					Gender = storePrincipalCreateVM.Gender,
+					Birthday = storePrincipalCreateVM.Birthday,
+					Email = storePrincipalCreateVM.Email,
+					Account = storePrincipalCreateVM.Account,
+					Password = storePrincipalCreateVM.Password,
+					RegistrationTime = DateTime.Now
+				};
+				_context.StorePrincipals.Add(storePrincipal);
+				await _context.SaveChangesAsync();
+			}
+			catch(Exception ex)
+			{
+				throw new Exception(ex.Message);
+			}
 
-        // GET: api/StorePrincipals/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<StorePrincipal>> GetStorePrincipal(int id)
-        {
-            var storePrincipal = await _context.StorePrincipals.FindAsync(id);
+			return "註冊成功";
+			//_context.StorePrincipals.Add(storePrincipal);
+			//await _context.SaveChangesAsync();
 
-            if (storePrincipal == null)
-            {
-                return NotFound();
-            }
+			//return CreatedAtAction("GetStorePrincipal", new { id = storePrincipal.Id }, storePrincipal);
+		}
 
-            return storePrincipal;
-        }
+        //// DELETE: api/StorePrincipals/5
+        //[HttpDelete("{id}")]
+        //public async Task<IActionResult> DeleteStorePrincipal(int id)
+        //{
+        //    var storePrincipal = await _context.StorePrincipals.FindAsync(id);
+        //    if (storePrincipal == null)
+        //    {
+        //        return NotFound();
+        //    }
 
-        // PUT: api/StorePrincipals/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutStorePrincipal(int id, StorePrincipal storePrincipal)
-        {
-            if (id != storePrincipal.Id)
-            {
-                return BadRequest();
-            }
+        //    _context.StorePrincipals.Remove(storePrincipal);
+        //    await _context.SaveChangesAsync();
 
-            _context.Entry(storePrincipal).State = EntityState.Modified;
+        //    return NoContent();
+        //}
 
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!StorePrincipalExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return NoContent();
-        }
-
-        // POST: api/StorePrincipals
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPost]
-        public async Task<ActionResult<StorePrincipal>> PostStorePrincipal(StorePrincipal storePrincipal)
-        {
-            _context.StorePrincipals.Add(storePrincipal);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction("GetStorePrincipal", new { id = storePrincipal.Id }, storePrincipal);
-        }
-
-        // DELETE: api/StorePrincipals/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteStorePrincipal(int id)
-        {
-            var storePrincipal = await _context.StorePrincipals.FindAsync(id);
-            if (storePrincipal == null)
-            {
-                return NotFound();
-            }
-
-            _context.StorePrincipals.Remove(storePrincipal);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
-        }
-
-        private bool StorePrincipalExists(int id)
-        {
-            return _context.StorePrincipals.Any(e => e.Id == id);
-        }
+        //private bool StorePrincipalExists(int id)
+        //{
+        //    return _context.StorePrincipals.Any(e => e.Id == id);
+        //}
     }
 }

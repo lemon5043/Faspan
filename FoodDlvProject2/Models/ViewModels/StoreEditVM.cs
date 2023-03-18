@@ -18,6 +18,8 @@ namespace FoodDlvProject2.Models.ViewModels
         [Required(ErrorMessage = "{0}必填")]
         [StringLength(100)]
         public string Address { get; set; }
+        public double Latitude { get; set; }
+        public double Longitude { get; set; }
         [Display(Name = "聯絡電話")]
         [Required(ErrorMessage = "{0}必填")]
         [StringLength(10)]

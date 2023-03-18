@@ -1,7 +1,7 @@
 ﻿@model FoodDlvProject2.Models.ViewModels.StoreEditVM
 
 @{
-    ViewData["Title"] = "Edit";
+	ViewData["Title"] = "Edit";
 }
 
 <h1>編輯店家</h1>
@@ -9,43 +9,110 @@
 
 <hr />
 <div class="row">
-    <div class="col-md-4">
-        <form asp-action="Edit" enctype="multipart/form-data">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="Id" />
-            <div class="form-group">
-                <label asp-for="StorePrincipalId" class="control-label"></label>
-                <select asp-for="StorePrincipalId" class="form-control" asp-items="ViewBag.StorePrincipalId"></select>
-                <span asp-validation-for="StorePrincipalId" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="StoreName" class="control-label"></label>
-                <input asp-for="StoreName" class="form-control" />
-                <span asp-validation-for="StoreName" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Address" class="control-label"></label>
-                <input asp-for="Address" class="form-control" />
-                <span asp-validation-for="Address" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="ContactNumber" class="control-label"></label>
-                <input asp-for="ContactNumber" class="form-control" />
-                <span asp-validation-for="ContactNumber" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Photo"class="control-label"></label>
-                <input type="file" input asp-for="Photo" class="form-control-file">
-                <span asp-validation-for="Photo" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
-            </div>
-        </form>
-    </div>
+	<div class="col-md-4">
+		<form asp-action="Edit" enctype="multipart/form-data">
+			<div asp-validation-summary="ModelOnly" class="text-danger"></div>
+			<input type="hidden" asp-for="Id" />
+			<div class="form-group">
+				<label asp-for="StorePrincipalId" class="control-label"></label>
+				<select asp-for="StorePrincipalId" class="form-control" asp-items="ViewBag.StorePrincipalId"></select>
+				<span asp-validation-for="StorePrincipalId" class="text-danger"></span>
+			</div>
+			<div class="form-group">
+				<label asp-for="StoreName" class="control-label"></label>
+				<input asp-for="StoreName" class="form-control" />
+				<span asp-validation-for="StoreName" class="text-danger"></span>
+			</div>
+			<div class="form-group">
+				<label asp-for="Address" class="control-label"></label>
+				<input asp-for="Address" class="form-control" />
+				<span asp-validation-for="Address" class="text-danger"></span>
+			</div>
+			<div class="form-group">
+				<label class="control-label">選擇店家位置</label>
+				<div id="map" style="height: 300px; width: 100%;"></div>
+			</div>
+
+			<div class="form-group">
+				<label asp-for="Latitude" class="control-label"></label>
+				<input type="text" cla ss="form-control" asp-for="Latitude" id="Latitude" readonly />
+			</div>
+			<div class="form-group">
+				<label asp-for="Longitude" class="control-label"></label>
+				<input type="text" class="form-control" asp-for="Longitude" id="Longitude" readonly />
+			</div>
+			<div class="form-group">
+				<label asp-for="ContactNumber" class="control-label"></label>
+				<input asp-for="ContactNumber" class="form-control" />
+				<span asp-validation-for="ContactNumber" class="text-danger"></span>
+			</div>
+			<div class="form-group">
+				<label asp-for="Photo" class="control-label"></label>
+				<input type="file" input asp-for="Photo" class="form-control-file">
+				<span asp-validation-for="Photo" class="text-danger"></span>
+			</div>
+			<div class="form-group">
+				<input type="submit" value="Save" class="btn btn-primary" />
+			</div>
+		</form>
+	</div>
 </div>
 
 <div>
-    <a asp-action="Index">Back to List</a>
+	<a asp-action="Index">
+返回列表</a>
 </div>
 
+
+@*VIEWBAG還是會透漏金鑰請更改*@
+
+@section Scripts
+	{
+	<script src="https://maps.googleapis.com/maps/api/js?key=@($"{ViewBag.Apikey}")"></script>
+	<script>
+		// 等待 DOM 載入完成
+		$(function () {
+			var addressInput = document.getElementById('Address');
+			var latitudeInput = document.getElementById('Latitude');
+			var longitudeInput = document.getElementById('Longitude');
+
+			// 建立一個 Google 地圖
+			var map = new google.maps.Map(document.getElementById('map'), {
+				zoom: 15
+			});
+
+			// 在 Google 地圖上顯示地點
+			function showLocationOnMap(lat, lng) {
+				var latLng = new google.maps.LatLng(lat, lng);
+				map.setCenter(latLng);
+				var marker = new google.maps.Marker({
+					position: latLng,
+					map: map
+				});
+			}
+
+			// 當地址輸入框的值改變時，將地址解析成經緯度並填入相應的輸入框中
+			addressInput.addEventListener('change', function () {
+				var geocoder = new google.maps.Geocoder();
+				geocoder.geocode({ 'address': addressInput.value }, function (results, status) {
+					if (status == google.maps.GeocoderStatus.OK) {
+						var lat = results[0].geometry.location.lat();
+						var lng = results[0].geometry.location.lng();
+						latitudeInput.value = lat;
+						longitudeInput.value = lng;
+						showLocationOnMap(lat, lng);
+					} else {
+						alert('地址解析失敗，請檢查地址是否正確。');
+					}
+				});
+			});
+
+			// 如果地址輸入框已經有值，則顯示該地址對應的位置
+			if (addressInput.value) {
+				var lat = parseFloat(latitudeInput.value);
+				var lng = parseFloat(longitudeInput.value);
+				showLocationOnMap(lat, lng);
+			}
+		});
+	</script>
+    }

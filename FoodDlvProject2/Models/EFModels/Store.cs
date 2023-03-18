@@ -33,7 +33,9 @@ namespace FoodDlvProject2.EFModels
         [Required(ErrorMessage = "{0}必填")]
         [StringLength(100)]
         public string Address { get; set; }
-        [Display(Name = "聯絡電話")]
+		public double Latitude { get; set; }
+		public double Longitude { get; set; }
+		[Display(Name = "聯絡電話")]
         [Required(ErrorMessage = "{0}必填")]
         [StringLength(10)]
         public string ContactNumber { get; set; }

@@ -17,9 +17,9 @@ namespace FoodDlvAPI.Models
         public long Id { get; set; }
         public int StoreId { get; set; }
         public string ProductName { get; set; }
-        public string Photo { get; set; }
-        public string ProductContent { get; set; }
-        public bool? Status { get; set; }
+        public string? Photo { get; set; }
+        public string? ProductContent { get; set; }
+        public bool Status { get; set; }
         public int UnitPrice { get; set; }
 
         public virtual Store Store { get; set; }
