@@ -1,8 +1,10 @@
-﻿using FoodDlvAPI.Interfaces;
+﻿using FoodDlvAPI.Controllers;
+using FoodDlvAPI.Interfaces;
 using FoodDlvAPI.Models;
 using FoodDlvAPI.Models.DTOs;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
+using System.Diagnostics.Metrics;
 
 namespace FoodDlvAPI.Models.Repositories
 {
@@ -18,19 +20,21 @@ namespace FoodDlvAPI.Models.Repositories
             }
             public async Task<string> CreateAsync(MemberRegisterDto model)
             {
-                try
+                if (AccountExists(model.Account))
+                { 
+                  return ("此帳號已被使用，請重新輸入");
+				} 
+				try
                 {
                     var EFModel = model.ToMember();
 
                     db.Members.Add(EFModel);
-
-
                     await db.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
+				}
+                catch (Exception ex)
                 {
-                    if (AccountExists(model.Account)) throw new Exception("此帳號已被使用，請重新輸入");
-                }
+					return ("註冊失敗");
+				}
 
                 return "新增成功";
             }

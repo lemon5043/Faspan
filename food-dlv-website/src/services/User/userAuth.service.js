@@ -32,7 +32,7 @@ class UserAuthService {
   }
 
   emailConfirmation() {
-    return axios.post("https://localhost:7093/api/Email/SendEmail?memberid=17");
+    return axios.post("https://localhost:7093/api/Email/SendEmail?memberid=31");
   }
 
   forgotPassword(account) {

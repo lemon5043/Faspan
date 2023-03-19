@@ -27,13 +27,15 @@ namespace FoodDlvAPI.Controllers
 	{
 		private readonly MemberService memberservice;
 		private readonly IConfiguration _configuration;
+		private readonly EmailController _emailController;
 
-		public MembersController(IConfiguration configuration)
+		public MembersController(IConfiguration configuration, EmailController emailController)
 		{
 			var db = new AppDbContext();
 			IMemberRepository repository = new MemberRepository(db);
 			this.memberservice = new MemberService(repository);
 			this._configuration = configuration;
+			_emailController = emailController;
 		}
 
 		[HttpPost("register")]
@@ -44,7 +46,13 @@ namespace FoodDlvAPI.Controllers
 			{
 				try
 				{
-					return await memberservice.RegisterAsync(member.ToMemberEditDto());
+					//return await memberservice.RegisterAsync(member.ToMemberEditDto());
+					var result = await memberservice.RegisterAsync(member.ToMemberEditDto());
+					if (result == "新增成功")
+					{
+						await _emailController.SendEmail(member.ToMember());
+					}
+					return result;
 				}
 				catch (Exception ex)
 				{
@@ -59,7 +67,9 @@ namespace FoodDlvAPI.Controllers
 				}
 				return BadRequest(ModelState);
 			}
+
 		}
+
 		[HttpPost("login")]
 		public async Task<ActionResult<object>> Login(MemberLoginVM model)
 		{

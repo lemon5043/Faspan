@@ -14,6 +14,8 @@ using MimeKit.Text;
 using MimeKit.Utils;
 using System.Security.Claims;
 using System.Security.Principal;
+using System.Net.Security;
+using System.Security.Cryptography.X509Certificates;
 
 namespace FoodDlvAPI.Controllers
 {
@@ -28,10 +30,8 @@ namespace FoodDlvAPI.Controllers
 			_context = context;
 		}
 		[HttpPost("SendEmail")]
-		public async Task<ActionResult> SendEmail(int memberid)
+		public async Task<ActionResult> SendEmail(Member member)
 		{
-			var member = await _context.Members
-				.SingleOrDefaultAsync(m => m.Id == memberid);
 
             var message = new MimeMessage();
 			// 寄件者
@@ -44,9 +44,6 @@ namespace FoodDlvAPI.Controllers
 			// 產生驗證碼
 			var confirmCode = Guid.NewGuid().ToString();
 
-			member.AccountStatusId = 1; // 待驗證
-			_context.Members.Update(member);
-			await _context.SaveChangesAsync();
 			// 使用 BodyBuilder 建立郵件內容
 			var bodyBuilder = new BodyBuilder();
 
@@ -75,6 +72,15 @@ namespace FoodDlvAPI.Controllers
 			return Ok("成功");
 
 		}
+		private static bool ValidateCertificate(object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors)
+		{
+			// Ignore certificate errors
+			return true;
+		}
+
+
+
+
 		[HttpGet("EmailConfirm")]
 		public async Task<ActionResult> EmailConfirm(int memberid)
 		{

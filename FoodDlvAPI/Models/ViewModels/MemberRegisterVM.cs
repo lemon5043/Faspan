@@ -45,5 +45,19 @@ namespace FoodDlvAPI.Models.ViewModels
 				RegistrationTime = source.RegistrationTime,
 			};
 		}
+		public static Member ToMember(this MemberRegisterVM source)
+		{
+			return new Member
+			{
+				Id = source.Id,
+				AccountStatusId = source.AccountStatusId,
+				Account = source.Account,
+				Password = source.Password,
+				FirstName = source.FirstName,
+				LastName = source.LastName,
+				Phone = source.Phone,
+				RegistrationTime = source.RegistrationTime,
+			};
+		}
 	}
 }
