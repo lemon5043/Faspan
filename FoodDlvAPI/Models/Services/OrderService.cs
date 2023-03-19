@@ -41,9 +41,9 @@ namespace FoodDlvAPI.Models.Services
             return orderId;
         }
 
-        public OrderDTO OrderTracking(int memberId)
+        public List<OrderDTO> OrderTracking(int memberId, int statusId)
         {
-            var orderTracking = _orderRepository.GetOrderTrack(memberId);
+            var orderTracking = _orderRepository.GetOrderTrack(memberId, statusId);
             return orderTracking;
         }
     }

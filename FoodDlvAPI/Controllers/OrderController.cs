@@ -63,11 +63,11 @@ namespace FoodDlvAPI.Controllers
         }
 
         [HttpGet("OrderTracking")]
-        public IActionResult OrderTracking(int memberId)
+        public IActionResult OrderTracking(int memberId, int statusId)
         {
             try
             {
-                var orderTracking = _orderService.OrderTracking(memberId);
+                var orderTracking = _orderService.OrderTracking(memberId, statusId);
                 return Json(orderTracking);
             }
             catch (Exception ex)

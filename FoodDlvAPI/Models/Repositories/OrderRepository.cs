@@ -156,26 +156,35 @@ namespace FoodDlvAPI.Models.Repositories
 
         }
 
-        public OrderDTO GetOrderTrack(int memberId)
+        public List<OrderDTO> GetOrderTrack(int memberId, int statusId)
         {
             try
             {
-                var order = _context.Orders
+                var orders = _context.Orders
                     .Include(o => o.OrderDetails)
                     .Include(o => o.OrderSchedules)
-                    .Where(o => o.MemberId == memberId && o.OrderSchedules.Max(os => os.StatusId) == 1)
-                    .First();          
+                    .Where(o => o.MemberId == memberId)
+                    .ToList();      
                 
-                var orderTrack = new OrderDTO
+                if(statusId == 6)
                 {
-                    Id = order.Id,
-                    MemberId = order.MemberId,
-                    MemberName = _context.Members.Where(m => m.Id == order.MemberId).Select(m => m.FirstName + " " + m.LastName).FirstOrDefault(),
-                    StoreId = order.StoreId,
-                    StoreName = _context.Stores.Where(s => s.Id == order.StoreId).Select(s => s.StoreName).First(),
-                    DetailQty = order.OrderDetails.GroupBy(od => od.IdentifyNum).Sum(gd => gd.First().Qty),
-                    DeliveryFee = order.DeliveryFee,
-                    Total = order.OrderDetails.GroupBy(od => od.IdentifyNum).Sum(gd =>
+                    orders = orders.Where(o => o.OrderSchedules.Max(os => os.StatusId) == 6).ToList();
+                }
+                else
+                {
+                    orders = orders.Where(o => o.OrderSchedules.Max(os => os.StatusId) < 6).ToList();
+                }
+                
+                var orderTrack = orders.Select(o => new OrderDTO
+                {
+                    Id = o.Id,
+                    MemberId = o.MemberId,
+                    MemberName = _context.Members.Where(m => m.Id == o.MemberId).Select(m => m.FirstName + " " + m.LastName).FirstOrDefault(),
+                    StoreId = o.StoreId,
+                    StoreName = _context.Stores.Where(s => s.Id == o.StoreId).Select(s => s.StoreName).First(),
+                    DetailQty = o.OrderDetails.GroupBy(od => od.IdentifyNum).Sum(gd => gd.First().Qty),
+                    DeliveryFee = o.DeliveryFee,
+                    Total = o.OrderDetails.GroupBy(od => od.IdentifyNum).Sum(gd =>
                     {
                         var productId = gd.First().ProductId;
                         var itemsId = gd.Select(d => d.ItemId).ToList();
@@ -183,10 +192,10 @@ namespace FoodDlvAPI.Models.Repositories
                         var itemsPrice = _context.ProductCustomizationItems.Where(pci => itemsId.Contains(pci.Id)).Sum(pci => pci.UnitPrice);
                         var qty = gd.First().Qty;
 
-                        return (productPrice + itemsPrice) * qty + order.DeliveryFee;
+                        return (productPrice + itemsPrice) * qty + o.DeliveryFee;
                     }),
                     
-                    Details = order.OrderDetails.GroupBy(od => od.IdentifyNum).Select(gd =>
+                    Details = o.OrderDetails.GroupBy(od => od.IdentifyNum).Select(gd =>
                     {
                         var productId = gd.First().ProductId;
                         var itemsId = gd.Select(d => d.ItemId).ToList();
@@ -209,14 +218,14 @@ namespace FoodDlvAPI.Models.Repositories
                         };
                     }).ToList(),
 
-                    Schedules = order.OrderSchedules.Select(os => new OrderScheduleDTO
+                    Schedules = o.OrderSchedules.Select(os => new OrderScheduleDTO
                     {
                         OrderId = os.OrderId,
                         StatusId = os.StatusId,
                         StatusName = _context.OrderStatues.Where(ost => ost.Id == os.StatusId).First().Status,
                         MarkTime = os.MarkTime,
                     }).ToList()
-                };                                            
+                }).ToList();                                            
 
                 return orderTrack;
             }
