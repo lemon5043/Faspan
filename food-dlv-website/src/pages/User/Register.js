@@ -25,9 +25,10 @@ const Register = () => {
       formData.append("lastName", lastName);
       formData.append("phone", phone);
       await UserAuthService.register(formData).then(() => {
-        UserAuthService.emailConfirmation();
-        alert("註冊成功，已寄 email 到您的信箱，");
-        navigate("/login");
+        UserAuthService.emailConfirmation().then(() => {
+          alert("註冊成功，已寄 email 到您的信箱，");
+          navigate("/login");
+        });
       });
     } catch (e) {
       console.log("e");

@@ -88,7 +88,7 @@ const DriverHome = () => {
   };
 
   return (
-    <div className="flex justify-center h-full% bg-black">
+    <div className="flex justify-center h-full bg-black">
       <div className="bg-black h-screen w-full max-w-md overflow-scroll pb-12">
         <div className="relative flex flex-col justify-center overflow-hidden">
           <div className=" w-full px-6 m-auto rounded-md max-w-md">
