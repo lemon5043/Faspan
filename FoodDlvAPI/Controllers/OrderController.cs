@@ -52,8 +52,8 @@ namespace FoodDlvAPI.Controllers
             {
                 _cartService.CheckOutCart(cartId);
                 //_orderService.CheckOutTime(storeId);
-                _orderService.OrderEstablished(cartId, addressId);
-                return new EmptyResult();
+                var orderId = _orderService.OrderEstablished(cartId, addressId);
+                return Json(orderId);
             }
             catch (Exception ex)
             {
@@ -63,11 +63,11 @@ namespace FoodDlvAPI.Controllers
         }
 
         [HttpGet("OrderTracking")]
-        public IActionResult OrderTracking(long orderId)
+        public IActionResult OrderTracking(int memberId)
         {
             try
             {
-                var orderTracking = _orderService.OrderTracking(orderId);
+                var orderTracking = _orderService.OrderTracking(memberId);
                 return Json(orderTracking);
             }
             catch (Exception ex)

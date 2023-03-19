@@ -34,14 +34,14 @@ namespace FoodDlvAPI.Interfaces
         /// <param name="storeId"></param>
         /// <param name="fee"></param>
         /// <param name="address"></param>
-        void CreateNewOrder(int memberId, int storeId, int fee, int addressId);
+        long CreateNewOrder(int memberId, int storeId, int fee, int addressId);
 
         /// <summary>
         /// 顯示訂單資訊與追蹤訂單目前狀態
         /// </summary>
         /// <param name="orderId"></param>
         /// <returns></returns>
-        OrderDTO GetOrderTrack(long orderId);
+        OrderDTO GetOrderTrack(int memberId);
 
         /// <summary>
         /// 取得外送費
