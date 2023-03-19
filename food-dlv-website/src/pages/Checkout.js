@@ -3,6 +3,8 @@ import { Label, Input, Button, Box } from "../components/Style/form-styling";
 import Logo from "../assets/images/logo.svg";
 import { Link, useNavigate } from "react-router-dom";
 import OrderService from "../services/order.service.js";
+import { HubConnectionBuilder, LogLevel } from "@microsoft/signalr"; //signalr使用
+
 
 const Checkout = ({ currentAddress, cartDetail, setCartDetail }) => {
   const [orderInfo, setOrderInfo] = useState(null);
@@ -27,6 +29,7 @@ const Checkout = ({ currentAddress, cartDetail, setCartDetail }) => {
         alert("訂單已送出!");
         setCartDetail(null);
         localStorage.removeItem("cartInfo");
+        //NotifyTheStore(1, orderId)//todo 傳入OrderId
         navigate("/");
       })
       .catch((error) => console.log(error));
@@ -35,6 +38,67 @@ const Checkout = ({ currentAddress, cartDetail, setCartDetail }) => {
   useEffect(() => {
     getOrderInfo();
   }, []);
+
+  //(Member)結帳後通知商家用(暫改為直接傳給外送員)
+  async function NotifyTheStore(storeId, orderId) {
+    try {
+
+      //const targetRole = "store";
+      const targetRole = "driver";
+      const driverId = 1;
+      const storeIdToInt = parseInt(storeId)
+      const connection = new HubConnectionBuilder()
+        .withUrl("https://localhost:7093/OrderHub")
+        .configureLogging(LogLevel.Information)
+        .build();
+      await connection.start();
+      await connection.invoke("JoinGroup", { Id: driverId, Role: targetRole }); //連上StoreGroup
+      await connection.invoke("NewOrder", driverId, orderId); //傳送訂單
+      await connection.invoke("LeaveGroup", { Id: driverId, Role: targetRole }); //離開StoreGroup
+
+    } catch (e) {
+      console.log(e)
+    }
+  }
+
+  // //(Member)結帳後開啟HubGroup 等待通知用
+  // async function JoinGroup(memberId) {
+  //   try {
+  //     const role = "member"
+  //     const connection = new HubConnectionBuilder()
+  //       .withUrl("https://localhost:7093/OrderHub")
+  //       .configureLogging(LogLevel.Information)
+  //       .build();
+  //     //監聽由server傳來的OrderId
+  //     connection.on("OrderArrive", async (OrderId) => {
+  //       //
+  //       //todo 這裡填入收到訂單通知後要執行的邏輯
+  //       //
+  //       swal.fire('您的餐點已經送達')
+  //       LeaveGrop(memberId)
+  //     });
+  //     await connection.start();
+  //     await connection.invoke("JoinGroup", { Id: parseInt(memberId), Role: role });
+  //   } catch (e) {
+  //     console.log(e);
+  //   }
+  // }
+
+  // //(Member)離開HubGroup
+  // async function LeaveGrop(memberId) {
+  //   try {
+  //     const role = "member"
+  //     const connection = new HubConnectionBuilder()
+  //       .withUrl("https://localhost:7093/OrderHub")
+  //       .configureLogging(LogLevel.Information)
+  //       .build();
+
+  //     await connection.start();
+  //     await connection.invoke("LeaveGroup", { Id: parseInt(memberId), Role: role });
+  //   } catch (e) {
+  //     console.log(e);
+  //   }
+  // }
 
   return (
     <div>

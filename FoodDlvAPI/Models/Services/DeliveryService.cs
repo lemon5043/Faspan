@@ -25,6 +25,7 @@ namespace FoodDlvAPI.Models.Services
         public async Task<AasignmentOrderDTO> UpdateOrder(int orderId, int driverId)
         {
             await _repository.UpdateOrder(orderId, driverId);
+            await _repository.SupMarkOrderStatus(orderId);//追加補上訂單狀態
             await _repository.MarkOrderStatus(orderId);
             await _repository.ChangeDeliveryStatus(driverId);
             return await _repository.NavigationToStore(orderId);

@@ -145,6 +145,7 @@ namespace FoodDlvAPI.Models.Repositories
                     OrderId = x.Id,
                     StoreAddress = x.Store.Address,
                     StoreName = x.Store.StoreName,
+                    MemberId = x.MemberId
                     //todo OrderDetails= x.OrderDetails
                 }).FirstOrDefaultAsync();
 
@@ -193,6 +194,34 @@ namespace FoodDlvAPI.Models.Repositories
             db.Entry(query).Property(updateModel).IsModified = true;
 
             db.SaveChanges();
+        }
+        //追加:補上OrderSchedule
+        public async Task SupMarkOrderStatus(int orderId)
+        {
+           for (int i = 0; i < 2; i++)
+            {
+            if (db.OrderSchedules == null) throw new Exception("抱歉，找不到指定資料，請確認後再試一次");
+
+            var query = await db.OrderSchedules
+                .Where(x => x.OrderId == orderId)
+                .Select(x => new OrderSchedule
+                {
+                    OrderId = x.OrderId,
+                    StatusId = x.StatusId,
+                })
+                .OrderBy(x => x.StatusId)
+                .LastOrDefaultAsync();
+
+            if (query == null) throw new Exception("抱歉，找不到指定資料，請確認後再試一次");
+           // if (query.StatusId < 3 || query.StatusId > 5) throw new Exception("抱歉，指定為不可外送狀態，請重新確認訂單狀態");
+ 
+            query.StatusId++;
+            query.MarkTime = DateTime.Now;
+
+            db.Add(query);
+            db.SaveChanges();
+            }
+
         }
         //更新訂單狀態
         public async Task MarkOrderStatus(int orderId)

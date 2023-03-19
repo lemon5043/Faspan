@@ -1,6 +1,5 @@
 import { HubConnectionBuilder, LogLevel } from "@microsoft/signalr"; //signalr使用
 
-//Member用
 //(Member)結帳後通知商家用
 async function NotifyTheStore(storeId, orderId) {
   try {
@@ -21,7 +20,7 @@ async function NotifyTheStore(storeId, orderId) {
 }
 
 //(Member)結帳後開啟HubGroup 等待通知用
-async function LinkStart(memberId) {
+async function JoinGroup(memberId) {
   try {
     const role = "member"
     const connection = new HubConnectionBuilder()

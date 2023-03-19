@@ -5,6 +5,7 @@ import ShoppingCart from "../../assets/images/shopping_cart.png";
 import { LayoutBtn, Btn } from "../../components/Style/button-styling";
 import { Link, useNavigate } from "react-router-dom";
 
+
 const Cart = ({ currentUser, currentAddress, setCartDetail, cartDetail }) => {
   const navigate = useNavigate();
 
@@ -61,6 +62,8 @@ const Cart = ({ currentUser, currentAddress, setCartDetail, cartDetail }) => {
     if (cartDetail.length === 0) return;
     navigate("/checkout");
   };
+
+
 
   return (
     <div>
