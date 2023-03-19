@@ -95,7 +95,7 @@ namespace FoodDlvAPI.Models.Repositories
             }
         }
 
-        public void CreateNewOrder(int memberId, int storeId, int fee, int addressId)
+        public long CreateNewOrder(int memberId, int storeId, int fee, int addressId)
         {
             try
             {
@@ -147,6 +147,7 @@ namespace FoodDlvAPI.Models.Repositories
 
                 createMark.CreateMark = false;
                 _context.SaveChanges();
+                return createMark.Id;
             }
             catch (Exception ex)
             {
@@ -155,15 +156,15 @@ namespace FoodDlvAPI.Models.Repositories
 
         }
 
-        public OrderDTO GetOrderTrack(long orderId)
+        public OrderDTO GetOrderTrack(int memberId)
         {
             try
             {
-                var order = _context.Orders                    
+                var order = _context.Orders
                     .Include(o => o.OrderDetails)
                     .Include(o => o.OrderSchedules)
-                    .Where(o => o.Id == orderId)
-                    .First();              
+                    .Where(o => o.MemberId == memberId && o.OrderSchedules.Max(os => os.StatusId) == 1)
+                    .First();          
                 
                 var orderTrack = new OrderDTO
                 {

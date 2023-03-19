@@ -29,19 +29,21 @@ namespace FoodDlvAPI.Models.Services
             _orderRepository.CheckOutTime(storeId);
         }
 
-        public void OrderEstablished(long cartId, int addressId)
+        public long OrderEstablished(long cartId, int addressId)
         {
             var memberId = _context.Carts.Where(c => c.Id == cartId).Select(c => c.MemberId).First();
             var storeId = _context.Carts.Where(c => c.Id == cartId).Select(c => c.StoreId).First();
             var fee = _orderRepository.getFee(cartId, addressId);
             _orderRepository.CashTransfer(memberId, storeId, fee);
-            _orderRepository.CreateNewOrder(memberId, storeId, fee, addressId);            
+            var orderId = _orderRepository.CreateNewOrder(memberId, storeId, fee, addressId);            
             _cartRepository.EmptyCart(memberId, storeId);
+
+            return orderId;
         }
 
-        public OrderDTO OrderTracking(long orderId)
+        public OrderDTO OrderTracking(int memberId)
         {
-            var orderTracking = _orderRepository.GetOrderTrack(orderId);
+            var orderTracking = _orderRepository.GetOrderTrack(memberId);
             return orderTracking;
         }
     }
