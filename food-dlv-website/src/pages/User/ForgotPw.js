@@ -13,6 +13,7 @@ const ForgotPw = () => {
   const forgotPasswordHandler = (e) => {
     try {
       e.preventDefault();
+      console.log(account);
       userAuthService.forgotPassword(account).then(() => {
         alert("已成功發送重設密碼連結，請至信箱查收");
         navigate("/");

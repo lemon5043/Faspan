@@ -4,6 +4,8 @@ import CartService from "../../services/Cart/cart.service";
 import ShoppingCart from "../../assets/images/shopping_cart.png";
 import { LayoutBtn, Btn } from "../../components/Style/button-styling";
 import { Link, useNavigate } from "react-router-dom";
+import cartService from "../../services/Cart/cart.service";
+import Swal from "sweetalert2";
 
 const Cart = ({ currentUser, currentAddress, setCartDetail, cartDetail }) => {
   const navigate = useNavigate();
@@ -33,12 +35,19 @@ const Cart = ({ currentUser, currentAddress, setCartDetail, cartDetail }) => {
   }
 
   //刪除購物車'被選取'商品明細
-  function RemoveDetail(identifyNum) {
-    console.log(identifyNum);
+  function RemoveDetail(memberId, identifyNum) {
     CartService.postRemoveDetail(identifyNum)
       .then(function (response) {
         console.log(response.data);
-        setCartDetail(CartService.getCurrentCart());
+        cartService.getCartInfo(memberId);
+        Swal.fire({
+          title: "刪除成功!",
+          icon: "success",
+          timer: 2000,
+          showConfirmButton: false,
+        }).then(() => {
+          setCartDetail(CartService.getCurrentCart());
+        });
       })
       .catch(function (error) {
         console.log(error);
@@ -51,6 +60,7 @@ const Cart = ({ currentUser, currentAddress, setCartDetail, cartDetail }) => {
       .then(function (response) {
         console.log(response);
         setCartDetail(null);
+        localStorage.removeItem("cartInfo");
       })
       .catch(function (error) {
         console.log(error);
@@ -100,7 +110,9 @@ const Cart = ({ currentUser, currentAddress, setCartDetail, cartDetail }) => {
                     <button onClick={null}>更新</button>
                     <button
                       className="text-red-600"
-                      onClick={() => RemoveDetail(detail.identifyNum)}
+                      onClick={() =>
+                        RemoveDetail(currentUser.userId, detail.identifyNum)
+                      }
                     >
                       刪除
                     </button>

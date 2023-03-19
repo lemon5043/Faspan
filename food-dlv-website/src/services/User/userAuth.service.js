@@ -29,6 +29,7 @@ class UserAuthService {
   logout() {
     localStorage.removeItem("user");
     localStorage.removeItem("address");
+    localStorage.removeItem("cartInfo");
   }
 
   emailConfirmation() {
@@ -39,7 +40,7 @@ class UserAuthService {
     return (
       axios.post("https://localhost:7093/api/Email/ForgetPassword"),
       {
-        account: account,
+        account,
       },
       {
         headers: { accept: "text/plain", "Content-Type": "application/json" },

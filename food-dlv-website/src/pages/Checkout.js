@@ -13,7 +13,6 @@ const Checkout = ({ currentAddress, cartDetail, setCartDetail }) => {
       cartDetail.cartDetails[0].cartId,
       currentAddress.id
     );
-    console.log(res.data);
     setOrderInfo(res.data);
     return res;
   };
@@ -23,11 +22,12 @@ const Checkout = ({ currentAddress, cartDetail, setCartDetail }) => {
       cartDetail.cartDetails[0].cartId,
       currentAddress.id
     )
-      .then(() => {
+      .then((res) => {
+        console.log(res);
         alert("訂單已送出!");
         setCartDetail(null);
         localStorage.removeItem("cartInfo");
-        navigate("/");
+        navigate("/order");
       })
       .catch((error) => console.log(error));
   };

@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { OverlayBg, OverlayMain } from "../../components/Style/overlay-styling";
 import UserAddressService from "../../services/User/userAddress.service";
 import { WhiteBtn } from "../../components/Style/button-styling";
+import DeleteIcon from "@mui/icons-material/Delete";
 
 const AddressOverlay = ({
   isOpen,
@@ -59,6 +60,16 @@ const AddressOverlay = ({
     }
   };
 
+  const DeleteAddress = async (e, id) => {
+    try {
+      await UserAddressService.deleteAddress(id);
+      chooseAddress();
+      alert("刪除成功");
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   useEffect(() => {
     chooseAddress();
   }, [currentUser]);
@@ -93,21 +104,31 @@ const AddressOverlay = ({
                   </div>
                   <p className="text-red-500 pl-2 text-sm">{errorMessage}</p>
                 </div>
-                <div>
+                <ol>
                   {address.length !== 0 &&
                     address.map((d) => {
                       return (
-                        <WhiteBtn
-                          key={d.id}
-                          onClick={(e) => searchHandler(e, d.address, d.id)}
-                          className="w-full flex my-1 py-2"
-                        >
-                          <FmdGoodIcon className="mr-2" />
-                          {d.address}
-                        </WhiteBtn>
+                        <li key={d.id} className="flex justify-between">
+                          <WhiteBtn
+                            key={d.id}
+                            onClick={(e) => searchHandler(e, d.address, d.id)}
+                            className="w-full flex my-1 py-2"
+                          >
+                            <div>
+                              <FmdGoodIcon className="mr-2" />
+                              {d.address}
+                            </div>
+                          </WhiteBtn>
+                          <button
+                            className="hover:bg-red-400 my-1"
+                            onClick={(e) => DeleteAddress(e, d.id)}
+                          >
+                            <DeleteIcon />
+                          </button>
+                        </li>
                       );
                     })}
-                </div>
+                </ol>
               </div>
             </OverlayMain>
           </OverlayBg>

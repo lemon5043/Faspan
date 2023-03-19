@@ -16,6 +16,11 @@ class OrderService {
     );
     return response;
   }
+
+  orderTracking(memberId) {
+    const response = axios.get(API_URL + `OrderTracking?memberId=${memberId}`);
+    return response;
+  }
 }
 
 export default new OrderService();

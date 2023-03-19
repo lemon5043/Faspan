@@ -33,6 +33,7 @@ import UserAuthService from "./services/User/userAuth.service";
 import Test from "./pages/___test___/Sidebar.test";
 import UserAddressService from "./services/User/userAddress.service";
 import cartService from "./services/Cart/cart.service";
+import Order from "./pages/Order";
 
 function App() {
   const [currentUser, setCurrentUser] = useState(
@@ -47,7 +48,6 @@ function App() {
     <BrowserRouter>
       <Routes>
         {/* 使用者頁面 */}
-        setCartDetail{" "}
         <Route
           path="/"
           element={
@@ -79,6 +79,15 @@ function App() {
             }
           ></Route>
           <Route path="register" element={<Register />}></Route>
+          <Route
+            path="order"
+            element={
+              <Order
+                currentUser={currentUser}
+                currentAddress={currentAddress}
+              />
+            }
+          ></Route>
           <Route path="store/:addressName" element={<Store />}></Route>
           <Route
             path="product/:storeId"

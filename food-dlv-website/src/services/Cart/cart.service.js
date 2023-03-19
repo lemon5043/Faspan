@@ -18,7 +18,9 @@ class CartService {
     const response = await axios.get(
       API_URL + `/CartInfo?memberId=${memberId}`
     );
-    localStorage.setItem("cartInfo", JSON.stringify(response.data[0]));
+    if (response.data.length != 0) {
+      localStorage.setItem("cartInfo", JSON.stringify(response.data[0]));
+    }
     return response;
   }
 

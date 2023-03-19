@@ -7,8 +7,8 @@ class UserAddressService {
     const response = axios.get(API_URL + `/index?memberId=${memberId}`);
     return response;
   }
-  createAddress(memberId, address) {
-    const respones = axios.post(
+  async createAddress(memberId, address) {
+    const respones = await axios.post(
       API_URL + `/Create?memberId=${memberId}&address=${address}`
     );
     return respones;
@@ -19,6 +19,11 @@ class UserAddressService {
     if (res.data.length === 0) return;
     const firstAddress = res.data[0];
     localStorage.setItem("address", JSON.stringify(firstAddress));
+  }
+
+  async deleteAddress(addressId) {
+    const res = await axios.delete(API_URL + "/Delete?id=" + addressId);
+    return res;
   }
 
   getCurrentAddress() {
