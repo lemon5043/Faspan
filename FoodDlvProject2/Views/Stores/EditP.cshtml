@@ -31,12 +31,24 @@
 
             <div class="form-group">
                 <label asp-for="Photo"class="control-label"></label>
-                <input type="file" input asp-for="Photo" class="form-control-file">
+                <input type="file" input asp-for="Photo" class="form-control-file" id="Photo">
                 <span asp-validation-for="Photo" class="text-danger"></span>
+            	@*<img id="previewImg" src="#" style="max-width:200px;margin-top:10px;margin-left:10px;display:none"/>*@
+               @{
+					var srcString = $"/public/Products/{ViewBag.PhotoFile}";
+
+				
+				}
+				<img id="previewImg" src="@srcString" style="max-width:200px;margin-top:10px;margin-left:10px;display:block" />
             </div>
-            <div class="form-group">
+        @*    <div class="form-group">
                 <label asp-for="ProductContent" class="control-label"></label>
                 <input asp-for="ProductContent" class="form-control" />
+                <span asp-validation-for="ProductContent" class="text-danger"></span>
+            </div>*@
+            <div class="form-group">
+                <label asp-for="ProductContent" class="control-label"></label>
+                <textarea asp-for="ProductContent" class="form-control"></textarea>
                 <span asp-validation-for="ProductContent" class="text-danger"></span>
             </div>
 
@@ -69,4 +81,43 @@
 <div>
     <a asp-action="Index">返回列表</a>
 </div>
+<script>
+	function previewImage() {
+		var preview = document.querySelector('#preview');
+		var file = document.querySelector('#myImage').files[0];
+		var reader = new FileReader();
 
+		reader.onloadend = function() {
+			preview.src = reader.result;
+		}
+
+		if (file) {
+			reader.readAsDataURL(file);
+		} else {
+			preview.src = "";
+		}
+	}
+</script>
+
+
+
+
+
+@section Scripts
+{
+<script>
+		document.getElementById("Photo").onchange = function () {
+			var reader = new FileReader();
+			reader.onload = function (e) {
+				document.getElementById("previewImg").src = e.target.result;
+				document.getElementById("previewImg").style.display="block";
+			}
+			reader.readAsDataURL(this.files[0]);
+	
+		};
+	</script>
+}
+
+
+
+}

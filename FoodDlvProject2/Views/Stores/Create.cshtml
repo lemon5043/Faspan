@@ -48,6 +48,7 @@
                 <label class="control-label"></label>
                 <input type="file" asp-for="Photo" class="form-control-file">
                 <span asp-validation-for="Photo" class="text-danger"></span>
+             	<img id="previewImg" src="#" style="max-width:200px;margin-top:10px;margin-left:10px;display:none"/>
             </div>
 
 
@@ -116,5 +117,18 @@
                 showLocationOnMap(lat, lng);
             }
         });
+
+
+        document.getElementById("Photo").onchange = function () {
+            var reader = new FileReader();
+            reader.onload = function (e) {
+                document.getElementById("previewImg").src = e.target.result;
+                document.getElementById("previewImg").style.display = "block";
+            }
+            reader.readAsDataURL(this.files[0]);
+
+        };
+
+
     </script>
     }
