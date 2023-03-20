@@ -349,7 +349,7 @@ const DriverMap = () => {
           {!workingStatus && (
             <Button onClick={ChangeWorkingStatus}>上線</Button>
           )}
-          <Button onClick={handleCenterButton}>置中</Button>
+          {/* <Button onClick={handleCenterButton}>置中</Button> */}
           <Button onClick={PickUpConfirmation}>取餐回報</Button>
           <Button onClick={DeliveryArrive}>餐點送達回報</Button>
           <Button onClick={AssignOrder}>測試傳送</Button>
