@@ -18,21 +18,22 @@ import swal from "sweetalert2";
 
 const DriverMap = () => {
   const { isLoaded, loadError } = useJsApiLoader({
-    googleMapsApiKey: process.env.REACT_APP_GOOGLE_MAPS_API_KEY,
-    //googleMapsApiKey: "",
+    //googleMapsApiKey: process.env.REACT_APP_GOOGLE_MAPS_API_KEY,
+    googleMapsApiKey: "AIzaSyC4ROC4M0UnotEsJp1pAmCds52JPXMcpBU",
   });
-  let [orderId, setOrderId] = useState(0);
+  const orderIdRef = useRef(0);
   let [driverId, setDriverId] = useState(0);
-  let [memberId, setMemberId] = useState(0);
-  let [storeName, setStoreName] = useState("");
+  const memberIdRef = useRef(0);
+  const storeNameRef = useRef("");
   let [storeAddress, setStoreAddress] = useState("");
-  let [customerAddress, setCustomerAddress] = useState("");
+  const customerAddressRef = useRef("");
   let [workingStatus, setWorkingStatus] = useState(false);
   let [position, setPosition] = useState({ lat: 0, lng: 0 });
   let [errorMessage, setErrorMessage] = useState("");
   let [map, setMap] = useState(/** @type google.maps.Map */(null));
   const [directionsResponse, setDirectionsResponse] = useState(null);
   const [distance, setDistance] = useState(0);
+  const distanceRef = useRef(0)
   const [duration, setDuration] = useState(0);
   const [connection, setConnection] = useState();
   //const dstTest = "桃園市中壢區新生路三段12號";
@@ -88,6 +89,7 @@ const DriverMap = () => {
       // eslint-disable-next-line no-undef
       travelMode: google.maps.TravelMode.DRIVING,
     });
+    distanceRef.current = results.distance
     setDirectionsResponse(results);
     setDistance(results.routes[0].legs[0].distance.text);
     setDuration(results.routes[0].legs[0].duration.text);
@@ -97,7 +99,7 @@ const DriverMap = () => {
   function clearRoute() {
     setDirectionsResponse(null);
     setDistance("");
-    //setDuration("");
+    setDuration("");
   }
 
   //加入HubGroup
@@ -110,13 +112,11 @@ const DriverMap = () => {
         .build();
       //監聽由server傳來的OrderId
       connection.on("AssignOrder", async (OrderId) => {
-        console.log(OrderId);
         const storeInfo = await delieveryService.OrderAasignment(OrderId);
-        setOrderId(storeInfo.orderId);
-        setStoreAddress(storeInfo.storeAddress);
+        orderIdRef.current = OrderId;
         setDriverId(driverId);
         //todo 跳出視窗顯示=>接受
-        NewOrder();
+        await NewOrder(OrderId, storeInfo.data.storeAddress);
         //todo 跳出視窗顯示=>取消
       });
       await connection.start();
@@ -146,12 +146,13 @@ const DriverMap = () => {
   }
 
   //向餐廳導航
-  async function NavationToStore(orderId, driverId) {
+  async function NavationToStore(orderId, driverId, storeAddress) {
     try {
-      const orderDetail = await delieveryService.OrderAccept(parseInt(orderId), parseInt(driverId));
-      setStoreName(orderDetail.StoreName);
-      setMemberId(orderDetail.MemberId);
-      calculateRoute(orderDetail.StoreAddress);
+      const dId = parseInt(driverId)
+      const orderDetail = await (await delieveryService.OrderAccept(orderId, dId)).data;
+      storeNameRef.current = orderDetail.storeName;
+      memberIdRef.current = orderDetail.memberId
+      await calculateRoute(storeAddress);
       setStoreAddress("");
     } catch (e) {
       setErrorMessage(e.response.data.errorMessage[0]);
@@ -162,9 +163,9 @@ const DriverMap = () => {
   async function NavationToCustomer(orderId) {
     try {
       clearRoute();
-      const customerAddress = await delieveryService.NavationToCustomer(parseInt(orderId));
-      setCustomerAddress(customerAddress);
-      calculateRoute(customerAddress);
+      const customerAddress = await (await delieveryService.NavationToCustomer(parseInt(orderId))).data;
+      customerAddressRef.current = customerAddress
+      await calculateRoute(customerAddress);
     } catch (e) {
       setErrorMessage(e.response.data.wrongAccountOrPassword[0]);
     }
@@ -174,24 +175,36 @@ const DriverMap = () => {
   async function OrderArrive() {
     try {
       clearRoute();
-      const memberIdToInt = parseInt(memberId)
-      const driver = (await driverAuthService.GetDriver(token)).data;
-      await delieveryService.DeliveryArrive(orderId, parseInt(driver.driverId), distance);
-      const targetRole = "Member";
+      const driver = await (await driverAuthService.GetDriver(token)).data;
+      await delieveryService.DeliveryArrive(orderIdRef.current, parseInt(driver.driverId), distanceRef.current);
+      distanceRef.current = 0
+      const targetRole = "member";
       const connection = new HubConnectionBuilder()
         .withUrl("https://localhost:7093/OrderHub")
         .configureLogging(LogLevel.Information)
         .build();
       await connection.start();
-      await connection.invoke("JoinGroup", { memberIdToInt, targetRole }); //連上MemberGroup
-      await connection.invoke("OrderArrive", memberIdToInt, orderId); //傳送訂單
-      await connection.invoke("LeaveGroup", { memberIdToInt, targetRole }); //離開MemberGroup
-      setOrderId(0);
-      setCustomerAddress("");
+      await connection.invoke("JoinGroup", { Id: memberIdRef.current, Role: targetRole }); //連上MemberGroup
+      await connection.invoke("OrderArrive", memberIdRef.current, orderIdRef.current); //傳送訂單
+      await connection.invoke("LeaveGroup", { Id: memberIdRef.current, Role: targetRole }); //離開MemberGroup
+      orderIdRef.current = 0;
+      customerAddressRef.current = "";
     } catch (e) {
       setErrorMessage(e.response.data.wrongAccountOrPassword[0]);
     }
   }
+
+  // async function test() {
+  //   const targetRole = "member";
+  //   const connection = new HubConnectionBuilder()
+  //     .withUrl("https://localhost:7093/OrderHub")
+  //     .configureLogging(LogLevel.Information)
+  //     .build();
+  //   await connection.start();
+  //   await connection.invoke("JoinGroup", { Id: memberIdRef.current, Role: targetRole }); //連上MemberGroup
+  //   await connection.invoke("OrderArrive", memberIdRef.current, orderIdRef.current); //傳送訂單
+  //   await connection.invoke("LeaveGroup", { Id: memberIdRef.current, Role: targetRole });
+  // }
 
 
   //(由Button觸發)畫面定位至目前所在位置
@@ -225,6 +238,7 @@ const DriverMap = () => {
         //停止每分鐘更新位置
         clearInterval(timer)
         LeaveGrop(driverId)
+        timer = null
       }
     } catch (e) {
       console.log(e);
@@ -232,7 +246,7 @@ const DriverMap = () => {
   };
 
   //(swal:由商店觸發)(signalR)接收到新訂單，確認後後回傳商店地址導航資訊
-  const NewOrder = () => {
+  const NewOrder = async (orderId, storeAddress) => {
     swal
       .fire({
         title: "新訂單!",
@@ -245,8 +259,7 @@ const DriverMap = () => {
         width: "20em",
       })
       .then(() => {
-        NavationToStore(orderId, driverId);
-        console.log("success");
+        NavationToStore(orderId, driverId, storeAddress);
       });
   };
 
@@ -255,7 +268,7 @@ const DriverMap = () => {
     swal
       .fire({
         title: "取餐確認",
-        text: "請至" + { storeName } + "領取" + { orderId } + "號餐點",
+        text: "請至" + storeNameRef.current + "領取" + orderIdRef.current + "號餐點",
         icon: "warning",
         showCancelButton: true,
         confirmButtonColor: "#3085d6",
@@ -266,7 +279,7 @@ const DriverMap = () => {
       })
       .then((result) => {
         if (result.isConfirmed) {
-          NavationToCustomer(orderId);
+          NavationToCustomer(orderIdRef.current);
         }
       });
   };
@@ -276,7 +289,7 @@ const DriverMap = () => {
     swal
       .fire({
         title: "送達確認",
-        text: "請至將餐點送至" + { customerAddress },
+        text: "請至將餐點送至" + customerAddressRef.current,
         icon: "warning",
         showCancelButton: true,
         confirmButtonColor: "#3085d6",
@@ -291,6 +304,26 @@ const DriverMap = () => {
         }
       });
   };
+
+  async function AssignOrder() {
+    try {
+      const targetRole = "driver";
+      const driverId = 1
+      const orderId = 41
+      const connection = new HubConnectionBuilder()
+        .withUrl("https://localhost:7093/OrderHub")
+        .configureLogging(LogLevel.Information)
+        .build();
+
+      await connection.start();
+      await connection.invoke("JoinGroup", { Id: driverId, Role: targetRole }); //連上driverGroup
+      await connection.invoke("AssignOrder", driverId, orderId); //傳送訂單
+      await connection.invoke("LeaveGroup", { Id: driverId, Role: targetRole }); //離開driverGroup
+
+    } catch (e) {
+      console.log(e)
+    }
+  }
 
   return (
     <>
@@ -316,9 +349,11 @@ const DriverMap = () => {
           {!workingStatus && (
             <Button onClick={ChangeWorkingStatus}>上線</Button>
           )}
-          <Button onClick={handleCenterButton}>置中?</Button>
+          {/* <Button onClick={handleCenterButton}>置中</Button> */}
           <Button onClick={PickUpConfirmation}>取餐回報</Button>
           <Button onClick={DeliveryArrive}>餐點送達回報</Button>
+          <Button onClick={AssignOrder}>測試傳送</Button>
+
         </GoogleMap>
       )}
     </>

@@ -93,9 +93,9 @@ const DriverHome = () => {
         <div className="relative flex flex-col justify-center overflow-hidden">
           <div className=" w-full px-6 m-auto rounded-md max-w-md">
             <p className="mt-6 text-2xl font-semibold text-center text-white">
-              修改基本資料
+              Hi! {lastName} {firstName}
             </p>
-            <form className="mt-6" onSubmit={EditHandler}>
+            {/* <form className="mt-6" onSubmit={EditHandler}>
               <div className="mb-2">
                 <Label htmlFor="account">密碼</Label>
                 <Input
@@ -190,7 +190,7 @@ const DriverHome = () => {
               <div className="mt-6">
                 <Button type="submit">下一步</Button>
               </div>
-            </form>
+            </form> */}
           </div>
         </div>
       </div>

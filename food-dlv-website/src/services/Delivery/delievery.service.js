@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = "https://localhost:7093/api/delievery";
+const API_URL = "https://localhost:7093/api/Delievery";
 
 class DelieveryService {
   ChangeWorkingStatus(DriverId, Longitude, Latitude) {
@@ -11,8 +11,8 @@ class DelieveryService {
     return axios.put(API_URL + "/UpdateLocation", { DriverId, Longitude, Latitude });
   }
 
-  OrderAasignment(orderId) {
-    const response = axios.get(API_URL + "/OrderAasignment" + "/" + orderId);
+  async OrderAasignment(orderId) {
+    const response = await axios.get(API_URL + `/OrderAasignment?orderid=${orderId}`);
     return response
   }
 
@@ -39,8 +39,8 @@ class DelieveryService {
     return response
   }
 
-  DeliveryArrive(orderId, driverId,milage) {
-    return axios.put(API_URL + "/", { orderId, driverId, milage });
+  DeliveryArrive(orderId, driverId, milage) {
+    return axios.put(API_URL + "/DeliveryArrive", { orderId, driverId, milage });
   }
 }
 

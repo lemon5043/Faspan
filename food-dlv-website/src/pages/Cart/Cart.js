@@ -7,6 +7,7 @@ import { Link, useNavigate } from "react-router-dom";
 import cartService from "../../services/Cart/cart.service";
 import Swal from "sweetalert2";
 
+
 const Cart = ({ currentUser, currentAddress, setCartDetail, cartDetail }) => {
   const navigate = useNavigate();
 
@@ -71,6 +72,8 @@ const Cart = ({ currentUser, currentAddress, setCartDetail, cartDetail }) => {
     if (cartDetail.length === 0) return;
     navigate("/checkout");
   };
+
+
 
   return (
     <div>

@@ -19,5 +19,6 @@ namespace FoodDlvAPI.Models.Services.Interfaces
         Task UpateLocation(LocationDTO location);
         Task<string> GetKey(string APIName);
         Task UpateOrder(DeliveryEndDTO dTO);
+        Task SupMarkOrderStatus(int orderId);
     }
 }
