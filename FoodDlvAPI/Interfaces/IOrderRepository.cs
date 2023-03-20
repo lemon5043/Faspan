@@ -41,7 +41,7 @@ namespace FoodDlvAPI.Interfaces
         /// </summary>
         /// <param name="orderId"></param>
         /// <returns></returns>
-        OrderDTO GetOrderTrack(int memberId);
+        List<OrderDTO> GetOrderTrack(int memberId, int statusId);
 
         /// <summary>
         /// 取得外送費
