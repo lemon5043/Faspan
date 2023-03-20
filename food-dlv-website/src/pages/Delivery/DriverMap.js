@@ -155,7 +155,7 @@ const DriverMap = () => {
         await delieveryService.OrderAccept(orderId, dId)
       ).data;
       storeNameRef.current = orderDetail.storeName;
-      memberIdRef.current = orderDetail.memberId;
+      memberIdRef.current = orderDetail.membreId;
       await calculateRoute(storeAddress);
       setStoreAddress("");
     } catch (e) {
@@ -184,7 +184,7 @@ const DriverMap = () => {
       const driver = await (await driverAuthService.GetDriver(token)).data;
       await delieveryService.DeliveryArrive(
         orderIdRef.current,
-        parseInt(driver.driverId),
+        driver.driverId,
         distanceRef.current
       );
       distanceRef.current = 0;
@@ -379,7 +379,7 @@ const DriverMap = () => {
           {/* <Button onClick={handleCenterButton}>置中</Button> */}
           <Button onClick={PickUpConfirmation}>取餐回報</Button>
           <Button onClick={DeliveryArrive}>餐點送達回報</Button>
-          <Button onClick={AssignOrder}>測試傳送</Button>
+          {/* <Button onClick={AssignOrder}>測試傳送</Button> */}
         </GoogleMap>
       )}
     </>
