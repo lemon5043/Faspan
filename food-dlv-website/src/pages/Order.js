@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from "react";
 import orderService from "../services/order.service";
 import { Label, Input, Button, Box } from "../components/Style/form-styling";
+import { HubConnectionBuilder, LogLevel } from "@microsoft/signalr"; //signalr使用
 import { Link } from "react-router-dom";
+import Swal from "sweetalert2";
 
 const Order = ({ currentUser, currentAddress }) => {
   const [data, setData] = useState(null);
@@ -10,7 +12,54 @@ const Order = ({ currentUser, currentAddress }) => {
     setData(res.data);
     console.log(res.data);
   };
+
+  // //(Member)結帳後開啟HubGroup 等待通知用
+  async function JoinGroup(memberId) {
+    try {
+      const role = "member";
+      const connection = new HubConnectionBuilder()
+        .withUrl("https://localhost:7093/OrderHub")
+        .configureLogging(LogLevel.Information)
+        .build();
+      //監聽由server傳來的OrderId
+      connection.on("OrderArrive", async (OrderId) => {
+        //
+        //todo 這裡填入收到訂單通知後要執行的邏輯
+        //
+        Swal.fire("您的餐點已經送達");
+        LeaveGrop(memberId);
+      });
+      await connection.start();
+      await connection.invoke("JoinGroup", {
+        Id: parseInt(memberId),
+        Role: role,
+      });
+    } catch (e) {
+      console.log(e);
+    }
+  }
+
+  // //(Member)離開HubGroup
+  async function LeaveGrop(memberId) {
+    try {
+      const role = "member";
+      const connection = new HubConnectionBuilder()
+        .withUrl("https://localhost:7093/OrderHub")
+        .configureLogging(LogLevel.Information)
+        .build();
+
+      await connection.start();
+      await connection.invoke("LeaveGroup", {
+        Id: parseInt(memberId),
+        Role: role,
+      });
+    } catch (e) {
+      console.log(e);
+    }
+  }
+
   useEffect(() => {
+    JoinGroup(currentUser.userId);
     DisplayOrder();
   }, []);
 

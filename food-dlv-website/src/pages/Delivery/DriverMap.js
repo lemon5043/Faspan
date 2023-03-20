@@ -30,10 +30,10 @@ const DriverMap = () => {
   let [workingStatus, setWorkingStatus] = useState(false);
   let [position, setPosition] = useState({ lat: 0, lng: 0 });
   let [errorMessage, setErrorMessage] = useState("");
-  let [map, setMap] = useState(/** @type google.maps.Map */(null));
+  let [map, setMap] = useState(/** @type google.maps.Map */ (null));
   const [directionsResponse, setDirectionsResponse] = useState(null);
   const [distance, setDistance] = useState(0);
-  const distanceRef = useRef(0)
+  const distanceRef = useRef(0);
   const [duration, setDuration] = useState(0);
   const [connection, setConnection] = useState();
   //const dstTest = "桃園市中壢區新生路三段12號";
@@ -42,9 +42,9 @@ const DriverMap = () => {
   useEffect(() => {
     async function GetDriverId() {
       const decode = await (await driverAuthService.GetDriver(token)).data;
-      setDriverId(decode.driverId)
+      setDriverId(decode.driverId);
     }
-    GetDriverId()
+    GetDriverId();
     //設定進入頁面時會不斷更新位置
     let timerId = null;
     if (navigator.geolocation) {
@@ -59,8 +59,7 @@ const DriverMap = () => {
           (error) => console.error(error),
           { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
         );
-      }
-        , 1000);
+      }, 1000);
     } else {
       console.error("Geolocation is not supported by this browser.");
     }
@@ -71,8 +70,6 @@ const DriverMap = () => {
   useEffect(() => {
     console.log(driverId);
   }, [driverId]);
-
-
 
   //地圖載入錯誤
   if (loadError) {
@@ -89,7 +86,7 @@ const DriverMap = () => {
       // eslint-disable-next-line no-undef
       travelMode: google.maps.TravelMode.DRIVING,
     });
-    distanceRef.current = results.distance
+    distanceRef.current = results.distance;
     setDirectionsResponse(results);
     setDistance(results.routes[0].legs[0].distance.text);
     setDuration(results.routes[0].legs[0].duration.text);
@@ -120,9 +117,11 @@ const DriverMap = () => {
         //todo 跳出視窗顯示=>取消
       });
       await connection.start();
-      await connection.invoke("JoinGroup", { Id: parseInt(driverId), Role: role });
-      setConnection(connection)
-
+      await connection.invoke("JoinGroup", {
+        Id: parseInt(driverId),
+        Role: role,
+      });
+      setConnection(connection);
     } catch (e) {
       console.log(e);
     }
@@ -131,15 +130,18 @@ const DriverMap = () => {
   //離開HubGroup
   async function LeaveGrop(driverId) {
     try {
-      const role = "driver"
+      const role = "driver";
       const connection = new HubConnectionBuilder()
         .withUrl("https://localhost:7093/OrderHub")
         .configureLogging(LogLevel.Information)
         .build();
 
       await connection.start();
-      await connection.invoke("LeaveGroup", { Id: parseInt(driverId), Role: role });
-      setConnection()
+      await connection.invoke("LeaveGroup", {
+        Id: parseInt(driverId),
+        Role: role,
+      });
+      setConnection();
     } catch (e) {
       console.log(e);
     }
@@ -148,10 +150,12 @@ const DriverMap = () => {
   //向餐廳導航
   async function NavationToStore(orderId, driverId, storeAddress) {
     try {
-      const dId = parseInt(driverId)
-      const orderDetail = await (await delieveryService.OrderAccept(orderId, dId)).data;
+      const dId = parseInt(driverId);
+      const orderDetail = await (
+        await delieveryService.OrderAccept(orderId, dId)
+      ).data;
       storeNameRef.current = orderDetail.storeName;
-      memberIdRef.current = orderDetail.memberId
+      memberIdRef.current = orderDetail.memberId;
       await calculateRoute(storeAddress);
       setStoreAddress("");
     } catch (e) {
@@ -163,8 +167,10 @@ const DriverMap = () => {
   async function NavationToCustomer(orderId) {
     try {
       clearRoute();
-      const customerAddress = await (await delieveryService.NavationToCustomer(parseInt(orderId))).data;
-      customerAddressRef.current = customerAddress
+      const customerAddress = await (
+        await delieveryService.NavationToCustomer(parseInt(orderId))
+      ).data;
+      customerAddressRef.current = customerAddress;
       await calculateRoute(customerAddress);
     } catch (e) {
       setErrorMessage(e.response.data.wrongAccountOrPassword[0]);
@@ -176,17 +182,31 @@ const DriverMap = () => {
     try {
       clearRoute();
       const driver = await (await driverAuthService.GetDriver(token)).data;
-      await delieveryService.DeliveryArrive(orderIdRef.current, parseInt(driver.driverId), distanceRef.current);
-      distanceRef.current = 0
+      await delieveryService.DeliveryArrive(
+        orderIdRef.current,
+        parseInt(driver.driverId),
+        distanceRef.current
+      );
+      distanceRef.current = 0;
       const targetRole = "member";
       const connection = new HubConnectionBuilder()
         .withUrl("https://localhost:7093/OrderHub")
         .configureLogging(LogLevel.Information)
         .build();
       await connection.start();
-      await connection.invoke("JoinGroup", { Id: memberIdRef.current, Role: targetRole }); //連上MemberGroup
-      await connection.invoke("OrderArrive", memberIdRef.current, orderIdRef.current); //傳送訂單
-      await connection.invoke("LeaveGroup", { Id: memberIdRef.current, Role: targetRole }); //離開MemberGroup
+      await connection.invoke("JoinGroup", {
+        Id: memberIdRef.current,
+        Role: targetRole,
+      }); //連上MemberGroup
+      await connection.invoke(
+        "OrderArrive",
+        memberIdRef.current,
+        orderIdRef.current
+      ); //傳送訂單
+      await connection.invoke("LeaveGroup", {
+        Id: memberIdRef.current,
+        Role: targetRole,
+      }); //離開MemberGroup
       orderIdRef.current = 0;
       customerAddressRef.current = "";
     } catch (e) {
@@ -206,7 +226,6 @@ const DriverMap = () => {
   //   await connection.invoke("LeaveGroup", { Id: memberIdRef.current, Role: targetRole });
   // }
 
-
   //(由Button觸發)畫面定位至目前所在位置
   const handleCenterButton = () => {
     if (map) {
@@ -216,7 +235,7 @@ const DriverMap = () => {
   };
 
   //(由Button觸發)(signalR)上、下線
-  let timer = null
+  let timer = null;
   async function ChangeWorkingStatus() {
     try {
       const driver = await (await driverAuthService.GetDriver(token)).data;
@@ -229,21 +248,25 @@ const DriverMap = () => {
         setWorkingStatus(true);
         //每分鐘更新位置
         timer = setInterval(async () => {
-          await delieveryService.UpdateLocation(driver.driverId, position.lng, position.lat)
-        }, 60000)
-        console.log(driverId)
-        await JoinGroup(driverId)
+          await delieveryService.UpdateLocation(
+            driver.driverId,
+            position.lng,
+            position.lat
+          );
+        }, 60000);
+        console.log(driverId);
+        await JoinGroup(driverId);
       } else {
         setWorkingStatus(false);
         //停止每分鐘更新位置
-        clearInterval(timer)
-        LeaveGrop(driverId)
-        timer = null
+        clearInterval(timer);
+        LeaveGrop(driverId);
+        timer = null;
       }
     } catch (e) {
       console.log(e);
     }
-  };
+  }
 
   //(swal:由商店觸發)(signalR)接收到新訂單，確認後後回傳商店地址導航資訊
   const NewOrder = async (orderId, storeAddress) => {
@@ -268,7 +291,12 @@ const DriverMap = () => {
     swal
       .fire({
         title: "取餐確認",
-        text: "請至" + storeNameRef.current + "領取" + orderIdRef.current + "號餐點",
+        text:
+          "請至" +
+          storeNameRef.current +
+          "領取" +
+          orderIdRef.current +
+          "號餐點",
         icon: "warning",
         showCancelButton: true,
         confirmButtonColor: "#3085d6",
@@ -308,8 +336,8 @@ const DriverMap = () => {
   async function AssignOrder() {
     try {
       const targetRole = "driver";
-      const driverId = 1
-      const orderId = 41
+      const driverId = 1;
+      const orderId = 69;
       const connection = new HubConnectionBuilder()
         .withUrl("https://localhost:7093/OrderHub")
         .configureLogging(LogLevel.Information)
@@ -319,9 +347,8 @@ const DriverMap = () => {
       await connection.invoke("JoinGroup", { Id: driverId, Role: targetRole }); //連上driverGroup
       await connection.invoke("AssignOrder", driverId, orderId); //傳送訂單
       await connection.invoke("LeaveGroup", { Id: driverId, Role: targetRole }); //離開driverGroup
-
     } catch (e) {
-      console.log(e)
+      console.log(e);
     }
   }
 
@@ -353,7 +380,6 @@ const DriverMap = () => {
           <Button onClick={PickUpConfirmation}>取餐回報</Button>
           <Button onClick={DeliveryArrive}>餐點送達回報</Button>
           <Button onClick={AssignOrder}>測試傳送</Button>
-
         </GoogleMap>
       )}
     </>
