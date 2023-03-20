@@ -4,6 +4,7 @@ import Logo from "../assets/images/logo.svg";
 import { Link, useNavigate } from "react-router-dom";
 import OrderService from "../services/order.service.js";
 import { HubConnectionBuilder, LogLevel } from "@microsoft/signalr"; //signalr使用
+import Swal from "sweetalert2";
 
 const Checkout = ({ currentAddress, cartDetail, setCartDetail }) => {
   const [orderInfo, setOrderInfo] = useState(null);
@@ -26,11 +27,17 @@ const Checkout = ({ currentAddress, cartDetail, setCartDetail }) => {
       .then((res) => {
         console.log(res.data);
         NotifyTheStore(1, res.data);
-        alert("訂單已送出!");
-        setCartDetail(null);
-        localStorage.removeItem("cartInfo");
-        //todo 傳入OrderId
-        navigate("/order");
+        Swal.fire({
+          title: "訂單已送出!",
+          icon: "success",
+          timer: 2000,
+          showConfirmButton: false,
+        }).then(() => {
+          setCartDetail(null);
+          localStorage.removeItem("cartInfo");
+          //todo 傳入OrderId
+          navigate("/order");
+        });
       })
       .catch((error) => console.log(error));
   };

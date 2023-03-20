@@ -7,28 +7,25 @@ import { Link, useNavigate } from "react-router-dom";
 import cartService from "../../services/Cart/cart.service";
 import Swal from "sweetalert2";
 
-
 const Cart = ({ currentUser, currentAddress, setCartDetail, cartDetail }) => {
   const navigate = useNavigate();
 
   //修改購物車'被選取'商品明細
-  function UpdateDetail(detail) {
-    console.log(
-      detail.identifyNum,
-      detail.storeId,
+  async function UpdateDetail(e, detail) {
+    await CartService.postUpdateCart(
+      currentUser.userId,
+      cartDetail.storeId,
       detail.productId,
-      detail.itemId,
-      detail.qty
-    );
-    CartService.postUpdateCart(
       detail.identifyNum,
-      detail.storeId,
-      detail.productId,
-      detail.itemId,
-      detail.qty
+      detail.itemsId,
+      detail.qty + 1
     )
       .then(function (response) {
         console.log(response.data);
+        cartService.getCartInfo(currentUser.userId);
+      })
+      .then(() => {
+        setCartDetail(CartService.getCurrentCart());
       })
       .catch(function (error) {
         console.log(error);
@@ -73,8 +70,6 @@ const Cart = ({ currentUser, currentAddress, setCartDetail, cartDetail }) => {
     navigate("/checkout");
   };
 
-
-
   return (
     <div>
       {/* 如果購物車有東西，就顯示資訊 */}
@@ -110,7 +105,9 @@ const Cart = ({ currentUser, currentAddress, setCartDetail, cartDetail }) => {
                   {/* 按鈕Update:回到'ProductSelection'頁面, 並記憶該筆商品明細的'客製化選項'與'商品數量' */}
                   {/* 在該頁面重新選擇完成後, 按鈕'確認修改':onClick={UpdateDetail} */}
                   <div className="flex justify-between">
-                    <button onClick={null}>更新</button>
+                    <button onClick={(e) => UpdateDetail(e, detail)}>
+                      更新
+                    </button>
                     <button
                       className="text-red-600"
                       onClick={() =>

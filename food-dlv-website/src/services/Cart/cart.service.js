@@ -29,13 +29,14 @@ class CartService {
     return data;
   }
 
-  postUpdateCart(identifyNum, storeId, productId, itemId, qty) {
+  postUpdateCart(memberId, storeId, productId, identifyNum, itemsId, qty) {
     const response = axios.post(API_URL + "/UpdateCart", {
-      IdentifyNum: identifyNum,
-      StordId: storeId,
-      ProductId: productId,
-      ItemsId: itemId,
-      Qty: qty,
+      memberId: memberId,
+      storeId: storeId,
+      productId: productId,
+      identifyNum: identifyNum,
+      itemsId: itemsId,
+      qty: qty,
     });
     return response;
   }

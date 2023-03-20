@@ -2,10 +2,11 @@ import React, { useEffect, useState } from "react";
 import orderService from "../services/order.service";
 import { Label, Input, Button, Box } from "../components/Style/form-styling";
 import { HubConnectionBuilder, LogLevel } from "@microsoft/signalr"; //signalr使用
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 
 const Order = ({ currentUser, currentAddress }) => {
+  const navigate = useNavigate();
   const [data, setData] = useState(null);
   const DisplayOrder = async () => {
     const res = await orderService.orderTracking(currentUser.userId, 5);
@@ -23,20 +24,20 @@ const Order = ({ currentUser, currentAddress }) => {
         .build();
       //監聽由server傳來的OrderId
       connection.on("OrderArrive", async (OrderId) => {
-        console.log(OrderId)
+        console.log(OrderId);
         //
         //todo 這裡填入收到訂單通知後要執行的邏輯
         //
         Swal.fire({
-          title:"您的 "+OrderId+" 號餐點已經送達",
+          title: "您的 " + OrderId + " 號餐點已經送達",
           icon: "warning",
           confirmButtonColor: "#3085d6",
           cancelButtonColor: "#d33",
           confirmButtonText: "取餐",
           heightAuto: false,
-        })
-        .then(()=>{
+        }).then(() => {
           LeaveGrop(memberId);
+          navigate("/");
         });
       });
       await connection.start();
