@@ -17,8 +17,10 @@ class OrderService {
     return response;
   }
 
-  orderTracking(memberId) {
-    const response = axios.get(API_URL + `OrderTracking?memberId=${memberId}`);
+  orderTracking(memberId, statusId) {
+    const response = axios.get(
+      API_URL + `OrderTracking?memberId=${memberId}&statusId=${statusId}`
+    );
     return response;
   }
 }

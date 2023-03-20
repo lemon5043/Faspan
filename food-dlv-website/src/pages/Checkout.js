@@ -24,10 +24,10 @@ const Checkout = ({ currentAddress, cartDetail, setCartDetail }) => {
       currentAddress.id
     )
       .then((res) => {
+        NotifyTheStore(1, res.data);
         alert("訂單已送出!");
         setCartDetail(null);
         localStorage.removeItem("cartInfo");
-        // NotifyTheStore(1, orderId);
         //todo 傳入OrderId
         navigate("/order");
       })
@@ -51,7 +51,7 @@ const Checkout = ({ currentAddress, cartDetail, setCartDetail }) => {
         .build();
       await connection.start();
       await connection.invoke("JoinGroup", { Id: driverId, Role: targetRole }); //連上StoreGroup
-      await connection.invoke("NewOrder", driverId, orderId); //傳送訂單
+      await connection.invoke("AssignOrder", driverId, orderId); //傳送訂單
       await connection.invoke("LeaveGroup", { Id: driverId, Role: targetRole }); //離開StoreGroup
     } catch (e) {
       console.log(e);

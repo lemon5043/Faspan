@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import InfiniteScroll from "react-infinite-scroller";
 import StoreService from "../../services/Store/store.service";
 import StoreCard from "../../components/Store/StoreCard";
 import { useParams } from "react-router-dom";

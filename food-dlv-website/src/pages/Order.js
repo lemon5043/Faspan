@@ -8,8 +8,9 @@ import Swal from "sweetalert2";
 const Order = ({ currentUser, currentAddress }) => {
   const [data, setData] = useState(null);
   const DisplayOrder = async () => {
-    const res = await orderService.orderTracking(currentUser.userId);
-    setData(res.data);
+    const res = await orderService.orderTracking(currentUser.userId, 5);
+    console.log(res.data.slice(-1)[0]);
+    setData(res.data.slice(-1)[0]);
   };
 
   // //(Member)結帳後開啟HubGroup 等待通知用
