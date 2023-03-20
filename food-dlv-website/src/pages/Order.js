@@ -23,11 +23,21 @@ const Order = ({ currentUser, currentAddress }) => {
         .build();
       //監聽由server傳來的OrderId
       connection.on("OrderArrive", async (OrderId) => {
+        console.log(OrderId)
         //
         //todo 這裡填入收到訂單通知後要執行的邏輯
         //
-        Swal.fire("您的餐點已經送達");
-        LeaveGrop(memberId);
+        Swal.fire({
+          title:"您的 "+OrderId+" 號餐點已經送達",
+          icon: "warning",
+          confirmButtonColor: "#3085d6",
+          cancelButtonColor: "#d33",
+          confirmButtonText: "取餐",
+          heightAuto: false,
+        })
+        .then(()=>{
+          LeaveGrop(memberId);
+        });
       });
       await connection.start();
       await connection.invoke("JoinGroup", {
