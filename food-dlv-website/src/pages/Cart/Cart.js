@@ -3,6 +3,8 @@ import React, { useState, useEffect } from "react";
 import CartService from "../../services/Cart/cart.service";
 import ShoppingCart from "../../assets/images/shopping_cart.png";
 import { LayoutBtn, Btn } from "../../components/Style/button-styling";
+import AddIcon from "@mui/icons-material/Add";
+import RemoveIcon from "@mui/icons-material/Remove";
 import { Link, useNavigate } from "react-router-dom";
 import cartService from "../../services/Cart/cart.service";
 import Swal from "sweetalert2";
@@ -11,7 +13,7 @@ const Cart = ({ currentUser, currentAddress, setCartDetail, cartDetail }) => {
   const navigate = useNavigate();
 
   //修改購物車'被選取'商品明細
-  async function UpdateDetail(e, detail) {
+  async function plusOne(e, detail) {
     await CartService.postUpdateCart(
       currentUser.userId,
       cartDetail.storeId,
@@ -20,12 +22,31 @@ const Cart = ({ currentUser, currentAddress, setCartDetail, cartDetail }) => {
       detail.itemsId,
       detail.qty + 1
     )
-      .then(function (response) {
+      .then(async (response) => {
         console.log(response.data);
-        cartService.getCartInfo(currentUser.userId);
+        await cartService.getCartInfo(currentUser.userId).then(() => {
+          setCartDetail(CartService.getCurrentCart());
+        });
       })
-      .then(() => {
-        setCartDetail(CartService.getCurrentCart());
+      .catch(function (error) {
+        console.log(error);
+      });
+  }
+
+  async function minusOne(e, detail) {
+    await CartService.postUpdateCart(
+      currentUser.userId,
+      cartDetail.storeId,
+      detail.productId,
+      detail.identifyNum,
+      detail.itemsId,
+      detail.qty - 1
+    )
+      .then(async (response) => {
+        console.log(response.data);
+        await cartService.getCartInfo(currentUser.userId).then(() => {
+          setCartDetail(CartService.getCurrentCart());
+        });
       })
       .catch(function (error) {
         console.log(error);
@@ -98,16 +119,25 @@ const Cart = ({ currentUser, currentAddress, setCartDetail, cartDetail }) => {
                   <p className="text-lg pb-2">{detail.productName}</p>
                   <p className="pb-2">{detail.itemName}</p>
                   <div className="flex justify-between">
-                    <p>{detail.qty} 項</p>
                     <p>$ {detail.subTotal}</p>
                   </div>
 
                   {/* 按鈕Update:回到'ProductSelection'頁面, 並記憶該筆商品明細的'客製化選項'與'商品數量' */}
                   {/* 在該頁面重新選擇完成後, 按鈕'確認修改':onClick={UpdateDetail} */}
                   <div className="flex justify-between">
-                    <button onClick={(e) => UpdateDetail(e, detail)}>
-                      更新
-                    </button>
+                    <div className="flex items-center">
+                      <RemoveIcon
+                        onClick={(e) => minusOne(e, detail)}
+                        className="cursor-pointer m-2"
+                      />
+                      <span className="text-slate-700 font-bold text-lg">
+                        {detail.qty}
+                      </span>
+                      <AddIcon
+                        onClick={(e) => plusOne(e, detail)}
+                        className="cursor-pointer m-2"
+                      />
+                    </div>
                     <button
                       className="text-red-600"
                       onClick={() =>
