@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 
 import CartService from "../../services/Cart/cart.service";
 import ShoppingCart from "../../assets/images/shopping_cart.png";
