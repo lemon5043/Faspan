@@ -10,7 +10,6 @@ const Order = ({ currentUser, currentAddress }) => {
   const DisplayOrder = async () => {
     const res = await orderService.orderTracking(currentUser.userId);
     setData(res.data);
-    console.log(res.data);
   };
 
   // //(Member)結帳後開啟HubGroup 等待通知用

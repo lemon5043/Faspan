@@ -24,7 +24,6 @@ const Checkout = ({ currentAddress, cartDetail, setCartDetail }) => {
       currentAddress.id
     )
       .then((res) => {
-        console.log(res);
         alert("訂單已送出!");
         setCartDetail(null);
         localStorage.removeItem("cartInfo");

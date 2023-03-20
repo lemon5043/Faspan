@@ -20,6 +20,7 @@ const Login = ({ setCurrentUser, setCurrentAddress, setCartDetail }) => {
       await userAuthService.login(account, password).then(async (res) => {
         localStorage.setItem("user", JSON.stringify(res.data));
         await userAddressService.displayAddress(res.data.userId);
+        await cartService.getCartInfo(res.data.userId);
         setCurrentAddress(userAddressService.getCurrentAddress());
         setCurrentUser(userAuthService.getCurrentUser());
         setCartDetail(cartService.getCurrentCart());
