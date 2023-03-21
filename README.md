@@ -7,7 +7,6 @@
 This is a graduation team project from ISpan Bootcamp (資展國際，原資策會)  
 It's a food delivery website including forestage and backstage
 
-![This is a alt text.](/Home.gif "This is a sample image.")
 
 ![This is a alt text.](/delivery.png "This is a sample image.")
 
