@@ -12,7 +12,7 @@ It's a food delivery website including forestage and backstage
 
 ![This is a alt text.](/backstage.png "This is a sample image.")
 
-## What Skill We Use?
+## Skills We Use
 
 ![This is a alt text.](/forestageSkill.png "This is a sample image.")
 
