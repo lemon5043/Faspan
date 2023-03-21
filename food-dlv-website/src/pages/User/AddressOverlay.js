@@ -22,7 +22,7 @@ const AddressOverlay = ({
 
   const enterHandler = (e) => {
     if (e.key === "Enter") {
-      searchHandler();
+      CreateNewAddress();
     }
   };
 
@@ -53,6 +53,7 @@ const AddressOverlay = ({
   const CreateNewAddress = async () => {
     try {
       await UserAddressService.createAddress(currentUser.userId, input);
+      setErrorMessage("");
       chooseAddress();
     } catch (e) {
       setErrorMessage("請輸入正確的地址");
