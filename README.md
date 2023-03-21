@@ -15,7 +15,8 @@ It's a food delivery website including forestage and backstage
 
 ## What Skill We Use?
 
-forestageSkill.png
+![This is a alt text.](/forestageSkill.png "This is a sample image.")
 
-backstageSkill.png
+![This is a alt text.](/backstageSkill.png "This is a sample image.")
+
 
