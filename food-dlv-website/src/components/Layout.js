@@ -147,8 +147,8 @@ const Layout = ({
                           </Link>
                         </DropdownItem>
                         <DropdownItem>
-                          <Link to="/user" className="text-base">
-                            客服中心
+                          <Link to="/payment" className="text-base">
+                            Faspay
                           </Link>
                         </DropdownItem>
                         <DropdownItem>

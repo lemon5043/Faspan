@@ -19,7 +19,7 @@ import swal from "sweetalert2";
 const DriverMap = () => {
   const { isLoaded, loadError } = useJsApiLoader({
     //googleMapsApiKey: process.env.REACT_APP_GOOGLE_MAPS_API_KEY,
-    googleMapsApiKey: "AIzaSyC4ROC4M0UnotEsJp1pAmCds52JPXMcpBU",
+    googleMapsApiKey: "",
   });
   const orderIdRef = useRef(0);
   let [driverId, setDriverId] = useState(0);

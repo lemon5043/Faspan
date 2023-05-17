@@ -60,7 +60,7 @@ var app = builder.Build();
 
 // 允許 react app 存取 此 api 的任何資料 
 app.UseCors(options =>
-options.WithOrigins("http://localhost:5129")
+options.WithOrigins("https://localhost:5129")
 .AllowAnyMethod()
 .AllowAnyHeader()
 .AllowCredentials());

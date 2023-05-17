@@ -34,6 +34,7 @@ import Test from "./pages/___test___/Sidebar.test";
 import UserAddressService from "./services/User/userAddress.service";
 import cartService from "./services/Cart/cart.service";
 import Order from "./pages/Order";
+import Payment from "./pages/Payment/Payment";
 
 function App() {
   const [currentUser, setCurrentUser] = useState(
@@ -66,6 +67,15 @@ function App() {
             path="user"
             element={
               <User currentUser={currentUser} setCurrentUser={setCurrentUser} />
+            }
+          ></Route>
+          <Route
+            path="payment"
+            element={
+              <Payment
+                currentUser={currentUser}
+                setCurrentUser={setCurrentUser}
+              />
             }
           ></Route>
           <Route

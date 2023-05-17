@@ -63,6 +63,13 @@ namespace FoodDlvAPI.Models.Repositories
             }
         }
 
+        /// <summary>
+        /// 扣除會員購買商品的費用
+        /// </summary>
+        /// <param name="memberId"></param>
+        /// <param name="storeId"></param>
+        /// <param name="fee"></param>
+        /// <exception cref="Exception"></exception>
         public void CashTransfer(int memberId, int storeId, int fee)
         {
             int memberWallet = _context.Members.First(m => m.Id == memberId).Balance;
